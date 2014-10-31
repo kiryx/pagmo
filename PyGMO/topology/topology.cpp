@@ -104,6 +104,8 @@ BOOST_PYTHON_MODULE(_topology) {
         topology_wrapper<topology::custom>("custom", "Custom topology.")
 		.def(init<const topology::base &>())
 		.def("add_edge",&topology::custom::add_edge,"Add edge.")
+		.def("set_weight",&topology::custom::set_weight,"Set weight.")
+		.def("get_weight",&topology::custom::get_weight,"Get weight.")
 		.def("remove_edge",&topology::custom::remove_edge,"Remove edge.")
 		.def("remove_all_edges",&topology::custom::remove_all_edges,"Remove all edges.");
 

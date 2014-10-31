@@ -58,6 +58,16 @@ void custom::add_edge(int n, int m)
 	base::add_edge(boost::numeric_cast<vertices_size_type>(n),boost::numeric_cast<vertices_size_type>(m));
 }
 
+void custom::set_weight(int n, int m, double ww)
+{
+	base::set_weight(boost::numeric_cast<vertices_size_type>(n),boost::numeric_cast<vertices_size_type>(m), ww);
+}
+
+double custom::get_weight(int n, int m)
+{
+	return base::get_weight(boost::numeric_cast<vertices_size_type>(n),boost::numeric_cast<vertices_size_type>(m));
+}
+
 /// Remove an edge.
 /**
  * Remove the edge connecting index n to index m. Will fail if either n or m is negative, if either n or m is not in the topology or
