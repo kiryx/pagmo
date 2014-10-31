@@ -205,6 +205,7 @@ void cmaes::evolve(population &pop) const
 	int eigeneval(m_eigeneval);
 	double sigma(m_sigma);
 	double var_norm = 0;
+	std::vector<bool> injected(lam, false);
 
 	// Some buffers
 	VectorXd meanold = VectorXd::Zero(N);
@@ -240,7 +241,29 @@ void cmaes::evolve(population &pop) const
 		ps.resize(N); ps = VectorXd::Zero(N);
 		counteval = 0;
 		eigeneval = 0;
+	} else {
+		std::vector<VectorXd> prev_pop(m_newpop);
+		// Compare the population in algorithm memory (m_memory) with the function argument (pop) for differences. Later we reinject those during the first round.
+		for (population::size_type n_idx = 0 ; n_idx < pop.size() ; ++n_idx ) {
+			bool found = false;
+			for (population::size_type idx = 0 ; idx < prev_pop.size() && !found; ++idx ) {
+				bool are_equal = true;
+				for (decision_vector::size_type j = 0; j < N && are_equal; ++j) {
+					if(pop.get_individual(n_idx).cur_x[j] != prev_pop[idx][j]) {
+						are_equal=false;
+					}
+				}
+				if (are_equal) {
+					found=true;
+					prev_pop.erase(prev_pop.begin() + idx);
+				}
+			}
+			if (!found) {
+				injected[n_idx] = true;
+			}
+		}
 	}
+
 	
 	// ----------------------------------------------//
 	// HERE WE START THE REAL ALGORITHM              //
@@ -303,6 +326,18 @@ void cmaes::evolve(population &pop) const
 			for (decision_vector::size_type j = 0; j<N; ++j ) {
 				if ( (newpop[i](j) < lb[j]) || (newpop[i](j) > ub[j]) ) {
 					newpop[i](j) = lb[j] + randomly_distributed_number() * (ub[j] - lb[j]);
+				}
+			}
+		}
+
+		// 1d - if its the first round, consider previously detected injected individuals
+		if (g==0) {
+			for (population::size_type i = 0; i<lam; ++i ) {
+				// If given individual was detected to be "injected", put it into newpop vector
+				if(injected[i]){
+					for (decision_vector::size_type j = 0; j < N; ++j ) {
+						newpop[i][j] = pop.get_individual(i).cur_x[j];
+					}
 				}
 			}
 		}
