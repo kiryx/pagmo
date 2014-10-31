@@ -306,6 +306,25 @@ void base::add_edge(const vertices_size_type &n, const vertices_size_type &m)
 	// Assign weight 1 to the edge.
 	boost::property_map<graph_type,boost::edge_weight_t>::type w = boost::get(boost::edge_weight,m_graph);
 	w[result.first] = 1;
+	set_weight(n, m, 1.0);
+}
+
+void base::set_weight(const vertices_size_type &n, const vertices_size_type &m, double ww)
+{
+	boost::property_map<graph_type,boost::edge_name_t>::type w = boost::get(boost::edge_name,m_graph);
+	typename boost::graph_traits<graph_type>::edge_descriptor e;
+	bool found;
+	tie(e, found) = edge(n, m, m_graph);
+	put(w, e, ww);
+}
+
+double base::get_weight(const vertices_size_type &n, const vertices_size_type &m)
+{
+	boost::property_map<graph_type,boost::edge_name_t>::type w = boost::get(boost::edge_name,m_graph);
+	typename boost::graph_traits<graph_type>::edge_descriptor e;
+	bool found;
+	tie(e, found) = edge(n, m, m_graph);
+	return get(w, e);
 }
 
 /// Remove an edge.

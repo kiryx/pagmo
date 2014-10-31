@@ -81,7 +81,7 @@ class __PAGMO_VISIBLE base
 		/**
 		 * The graph is a directed and bidirectional adjacency list.
 		 */
-		typedef boost::adjacency_list<boost::vecS,boost::vecS,boost::bidirectionalS,boost::no_property,boost::property<boost::edge_weight_t,int>,boost::vecS> graph_type;
+		typedef boost::adjacency_list<boost::vecS,boost::vecS,boost::bidirectionalS,boost::no_property,boost::property<boost::edge_weight_t, int, boost::property<boost::edge_name_t, double> >,boost::vecS> graph_type;
 		/// Iterator over the vertices.
 		typedef boost::graph_traits<graph_type>::vertex_iterator v_iterator;
 		/// Iterator over adjacent vertices.
@@ -129,6 +129,8 @@ class __PAGMO_VISIBLE base
 		std::vector<vertices_size_type> get_v_inv_adjacent_vertices(const vertices_size_type &) const;
 		edges_size_type get_num_adjacent_vertices(const vertices_size_type &) const;
 		edges_size_type get_num_inv_adjacent_vertices(const vertices_size_type &) const;
+		void set_weight(const vertices_size_type &, const vertices_size_type &, double);
+		double get_weight(const vertices_size_type &, const vertices_size_type &);
 		//@}
 	protected:
 		/** @name Low-level graph access and manipulation methods. */

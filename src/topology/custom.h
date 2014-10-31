@@ -49,6 +49,8 @@ class __PAGMO_VISIBLE custom: public base
 		/** @name High-level graph manipulation for custom topologies. */
 		//@{
 		void add_edge(int,int);
+		void set_weight(int,int, double);
+		double get_weight(int,int);
 		void remove_edge(int,int);
 		void remove_all_edges();
 		//@}
