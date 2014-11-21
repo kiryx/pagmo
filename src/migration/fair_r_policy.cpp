@@ -41,7 +41,7 @@ namespace pagmo { namespace migration {
  *
  * @see base_r_policy::base_r_policy.
  */
-fair_r_policy::fair_r_policy(const double &rate, rate_type type):base_r_policy(rate,type) {}
+fair_r_policy::fair_r_policy(const double &rate, rate_type type, const int variant):base_r_policy(rate,type), m_variant(variant) {}
 
 base_r_policy_ptr fair_r_policy::clone() const
 {
@@ -95,12 +95,40 @@ std::vector<std::pair<population::size_type,std::vector<population::individual_t
 	while (left < right) {
 		// If the index belongs to one of the immigrants
 		if (*left >= dest.size()) {
+
+			if(m_variant == 2) {
+				decision_vector im_x(immigrants[*left-dest.size()].cur_x);
+				bool is_copy = true;
+				for ( unsigned int idx = 0 ; idx < dest.size() ; ++idx ) {
+					decision_vector isl_x(dest.get_individual(idx).cur_x);
+					is_copy = true;
+					for (unsigned int d_idx = 0 ; d_idx < im_x.size() ; ++d_idx) {
+						if (im_x[d_idx] != isl_x[d_idx]) {
+							is_copy = false;
+							break;
+						}
+					}
+					if (is_copy) {
+						break;
+					}
+				}
+				if (is_copy) {
+					++left;
+					continue;
+				}
+			}
+
 			// Move the right iterator up to when it points to the worst of the natives
 			while (*right >= dest.size()) {
 				--right;
 			};
 			if (right>left) {
-				result.push_back(std::make_pair(*right,*left-dest.size()));
+				if (m_variant == 0 || m_variant == 2) {
+					result.push_back(std::make_pair(*right,*left-dest.size()));
+				} else if (m_variant == 1) {
+					result.push_back(std::make_pair(0, *left-dest.size()));
+					break;
+				}
 			--right;
 			}
 		}

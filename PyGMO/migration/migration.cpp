@@ -102,7 +102,7 @@ BOOST_PYTHON_MODULE(_migration) {
 
 	// Fair replacement policy.
 	migration_r_policy_wrapper<migration::fair_r_policy>("fair_r_policy","Fair migration replacement policy.")
-		.def(init<optional<const double &, migration::rate_type> >());
+		.def(init<optional<const double &, migration::rate_type, const int> >());
 
 	// Random replacement policy.
 	migration_r_policy_wrapper<migration::random_r_policy>("random_r_policy","Random migration replacement policy.")

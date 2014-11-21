@@ -49,12 +49,13 @@ namespace pagmo { namespace migration {
 class __PAGMO_VISIBLE fair_r_policy: public base_r_policy
 {
 	public:
-		fair_r_policy(const double &rate = 1, rate_type type = absolute);
+		fair_r_policy(const double &rate = 1, rate_type type = absolute, const int variant=0);
 		base_r_policy_ptr clone() const;
 		std::vector<std::pair<population::size_type,std::vector<population::individual_type>::size_type> >
 			select(const std::vector<population::individual_type> &, const population &) const;
 	private:	
 		friend class boost::serialization::access;
+		const int m_variant;
 		template <class Archive>
 		void serialize(Archive &ar, const unsigned int)
 		{
