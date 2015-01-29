@@ -253,6 +253,19 @@ BOOST_PYTHON_MODULE(_algorithm) {
 		.add_property("ftol",&algorithm::cmaes::get_ftol,&algorithm::cmaes::set_ftol)
 		.add_property("xtol",&algorithm::cmaes::get_xtol,&algorithm::cmaes::set_xtol);
 
+	// CMAES2
+	algorithm_wrapper<algorithm::cmaes2>("cmaes2","Covariance Matrix Adaptation Evolutionary Startegy")
+		.def(init<optional<int, double, double, double, double, double, double, double, bool, int> >())
+		.add_property("gen",&algorithm::cmaes2::get_gen,&algorithm::cmaes2::set_gen)
+		.add_property("cc",&algorithm::cmaes2::get_cc,&algorithm::cmaes2::set_cc)
+		.add_property("cs",&algorithm::cmaes2::get_cs,&algorithm::cmaes2::set_cs)
+		.add_property("c1",&algorithm::cmaes2::get_c1,&algorithm::cmaes2::set_c1)
+		.add_property("cmu",&algorithm::cmaes2::get_cmu,&algorithm::cmaes2::set_cmu)
+		.add_property("sigma",&algorithm::cmaes2::get_sigma,&algorithm::cmaes2::set_sigma)
+		.add_property("ftol",&algorithm::cmaes2::get_ftol,&algorithm::cmaes2::set_ftol)
+		.add_property("xtol",&algorithm::cmaes2::get_xtol,&algorithm::cmaes2::set_xtol)
+		.add_property("min_inj_rank",&algorithm::cmaes2::get_min_inj_rank,&algorithm::cmaes2::set_min_inj_rank);
+
 	// Monte-carlo.
 	algorithm_wrapper<algorithm::monte_carlo>("monte_carlo","Monte-Carlo search.")
 		.def(init<int>());
