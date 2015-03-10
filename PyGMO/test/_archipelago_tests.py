@@ -89,6 +89,21 @@ class ArchipelagoTests(unittest.TestCase):
         top.set_weight(0.0)
         self.do_test_migr_setup(pop_xs, pop_xs, top, 1)
 
+    def test_ring_null_alg(self):
+        pop_xs = (
+            ((2.0, ), (3.0, )),
+            ((1.0, ), (5.0, )),
+            ((4.0, ), (6.0, )),
+        )
+        # Since we evolve the populations in index-order, the champion of pop1 ([1, ])
+        # will travel along the ring until pop4
+        out_pop_xs = (
+            ((2.0, ), (3.0, )),  # pop1 is not changed, as it starts the migration and encounters an empty buffer of migrants, it sends (2.0,) to all neighbours
+            ((1.0, ), (2.0, )),  # pop2 will receive the individal (2.0, ), and send the (1.0, ) to neighbours
+            ((2.0, ), (4.0, )),  # pop3 will receive both (2.0, ) and (1.0, ), but accepts only (2.0,) as it arrived earlier!
+        )
+        top = topology.ring(3)
+        self.do_test_migr_setup(pop_xs, out_pop_xs, top, 1)
 
     def test_distribution_type(self):
         """Testing whether the distribution_type property works"""
@@ -102,6 +117,7 @@ class ArchipelagoTests(unittest.TestCase):
             a.distribution_type = dist_type
 
             self.assertEqual(a.distribution_type, dist_type)
+
 
 def get_archipelago_test_suite():
     suite = unittest.TestSuite()
