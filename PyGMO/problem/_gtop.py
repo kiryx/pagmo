@@ -27,6 +27,41 @@ cassini_1._orig_init = cassini_1.__init__
 cassini_1.__init__ = _cassini_1_ctor
 
 
+def _pl2pl_fixed_time(self, ast0=jpl_lp('earth'), ast1=jpl_lp('mars'), t0=epoch(0),
+    t1=epoch(1000), sc=spacecraft(2000, 0.3, 3000), n_seg=5):
+    """
+    Constructs a Planet 2 Planet problem with fixed time.
+    Chromosome is defined as:
+
+    x = [m_f, Th_0_x, Th_0_y, Th_0_z, .., Th_n_x, Th_n_y, Th_n_z]
+    , where 'm_f' is the final mass, while 'Th_i_j' is the throttle component in direction 'j' (x,y,z) for the 'i'-th segment.
+
+    USAGE: problem.pl2pl_fixed_time(ast0=gtoc7(1000), ast1=gtoc7(1000), t0=epoch(3000),
+               t1=epoch(4000), sc=spacecraft(2000, 0.3, 3000), n_seg = 5)
+
+    * ast0: first planet
+    * ast0: second planet
+    * t0: departure epoch (from planet ast0)
+    * t1: arrival epoch (to planet ast1)
+    * sc: spacecraft object
+    * n_seg: number of segments
+
+    """
+
+    # We construct the arg list for the original constructor exposed by
+    # boost_python
+    arg_list = []
+    arg_list.append(ast0)
+    arg_list.append(ast1)
+    arg_list.append(t0)
+    arg_list.append(t1)
+    arg_list.append(sc)
+    arg_list.append(n_seg)
+    self._orig_init(*arg_list)
+pl2pl_fixed_time._orig_init = pl2pl_fixed_time.__init__
+pl2pl_fixed_time.__init__ = _pl2pl_fixed_time
+
+
 def _gtoc_1_ctor(self):
     """
     Constructs a GTOC 1 Problem (Box-Constrained Continuous Single-Objective)

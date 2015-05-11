@@ -137,6 +137,7 @@ bool pl2pl_fixed_time::get_high_fidelity() const
 
 void pl2pl_fixed_time::set_high_fidelity(bool hf_option)
 {
+	reset_caches();
 	m_leg.set_high_fidelity(hf_option);
 }
 
