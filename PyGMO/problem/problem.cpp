@@ -388,6 +388,10 @@ BOOST_PYTHON_MODULE(_problem) {
 		.add_property("values",  make_function(&problem::tsp_cs::get_values, return_value_policy<copy_const_reference>()))
 		.add_property("max_path_length",  &problem::tsp_cs::get_max_path_length);
 
+	// Planet to Planet, fixed time.
+	problem_wrapper<problem::pl2pl_fixed_time>("pl2pl_fixed_time","Planet to Planet fixed time.")
+		.def(init<optional<int,int,kep_toolbox::epoch,kep_toolbox::epoch,kep_toolbox::sims_flanagan::spacecraft,int> >());
+
 	// SCH
 	problem_wrapper<problem::sch>("sch","Shaffer's study problem.");
 	// FON
