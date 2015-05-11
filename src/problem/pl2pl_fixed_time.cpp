@@ -73,7 +73,7 @@ pl2pl_fixed_time::pl2pl_fixed_time(const planet::planet_ptr ast0,const planet::p
 	m_leg.set_t_f(t1);
 	m_leg.set_high_fidelity(true);
 	// Initial state.
-	m_ast0.eph(m_t0,r,v);
+	m_ast0->eph(m_t0,r,v);
 	m_leg.set_x_i(sc_state(r,v,initial_mass));
 
 	decision_vector lb_v, ub_v;
@@ -109,7 +109,7 @@ void pl2pl_fixed_time::compute_constraints_impl(constraint_vector &c, const deci
 	}
 	// Final state.
 	double final_mass = x[0];
-	m_ast1.eph(m_t1,r,v);
+	m_ast1->eph(m_t1,r,v);
 	m_leg.set_x_f(sc_state(r,v,final_mass));
 
 	//Load state mismatches into constraints vector.

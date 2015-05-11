@@ -90,13 +90,13 @@ class __PAGMO_VISIBLE pl2pl_fixed_time: public base
 			ar & m_t1;
 			ar & const_cast< kep_toolbox::sims_flanagan::spacecraft &>(m_spacecraft);*/
 		}
-		const int						m_n_seg;
 		const kep_toolbox::planet::planet_ptr		        m_ast0;
 		const kep_toolbox::planet::planet_ptr		        m_ast1;
-		mutable kep_toolbox::sims_flanagan::leg			m_leg;
 		const kep_toolbox::epoch				m_t0;
 		const kep_toolbox::epoch				m_t1;		
 		const kep_toolbox::sims_flanagan::spacecraft		m_spacecraft;
+		const int						m_n_seg;
+		mutable kep_toolbox::sims_flanagan::leg			m_leg;
 };
 
 } } // namespaces
