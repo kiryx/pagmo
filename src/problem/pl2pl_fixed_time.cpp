@@ -57,25 +57,23 @@ namespace pagmo { namespace problem {
 
 pl2pl_fixed_time::pl2pl_fixed_time(const planet::planet_ptr ast0,const planet::planet_ptr ast1,const epoch t0,const epoch t1,const spacecraft S,const int n_seg):
 	base(3 * n_seg + 1,0,1,n_seg + 7, n_seg, 1E-5),
-	m_n_seg(n_seg),m_t0(t0),m_t1(t1),m_spacecraft(S)
+	m_ast0(ast0), m_ast1(ast1), m_t0(t0), m_t1(t1), m_spacecraft(S), m_n_seg(n_seg)
 {
 	if (n_seg <= 0) {
 		pagmo_throw(value_error,"invalid number of segments");
 	}
-	m_asteroids.push_back(planet::gtoc7(ast0));
-	m_asteroids.push_back(planet::gtoc7(ast1));
 	
 	array3D r, v;
 	double initial_mass = m_spacecraft.get_mass();
 	// Build leg.
 	m_leg.set_spacecraft(m_spacecraft);
-	m_leg.set_mu(1.32712440018e20);
+	m_leg.set_mu(ASTRO_MU_SUN);
 	m_leg.set_throttles_size(n_seg);
 	m_leg.set_t_i(t0);
 	m_leg.set_t_f(t1);
 	m_leg.set_high_fidelity(true);
 	// Initial state.
-	m_asteroids[0].eph(m_t0,r,v);
+	m_ast0.eph(m_t0,r,v);
 	m_leg.set_x_i(sc_state(r,v,initial_mass));
 
 	decision_vector lb_v, ub_v;
@@ -111,7 +109,7 @@ void pl2pl_fixed_time::compute_constraints_impl(constraint_vector &c, const deci
 	}
 	// Final state.
 	double final_mass = x[0];
-	m_asteroids[1].eph(m_t1,r,v);
+	m_ast1.eph(m_t1,r,v);
 	m_leg.set_x_f(sc_state(r,v,final_mass));
 
 	//Load state mismatches into constraints vector.
@@ -130,6 +128,16 @@ void pl2pl_fixed_time::compute_constraints_impl(constraint_vector &c, const deci
 std::string pl2pl_fixed_time::get_name() const
 {
 	return "pl2pl_fixed_time";
+}
+
+bool pl2pl_fixed_time::get_high_fidelity() const
+{
+	return m_leg.get_high_fidelity();
+}
+
+void pl2pl_fixed_time::set_high_fidelity(bool hf_option)
+{
+	m_leg.set_high_fidelity(hf_option);
 }
 
 /// A pretty description of the chromosome

@@ -28,7 +28,7 @@
 #include <vector>
 #include <string>
 #include <keplerian_toolbox/epoch.h>
-#include <keplerian_toolbox/planet/gtoc7.h>
+#include <keplerian_toolbox/planet/jpl_low_precision.h>
 #include <keplerian_toolbox/sims_flanagan/leg.h>
 #include <keplerian_toolbox/sims_flanagan/spacecraft.h>
 #include <keplerian_toolbox/sims_flanagan/throttle.h>
@@ -60,6 +60,8 @@ class __PAGMO_VISIBLE pl2pl_fixed_time: public base
 		base_ptr clone() const;
 		std::string get_name() const;
 		std::string pretty(const std::vector<double> &x) const;
+		bool get_high_fidelity() const;
+		void set_high_fidelity(bool hf_option);
 	protected:
 		void objfun_impl(fitness_vector &, const decision_vector &) const;
 		void compute_constraints_impl(constraint_vector &, const decision_vector &) const;
@@ -89,7 +91,8 @@ class __PAGMO_VISIBLE pl2pl_fixed_time: public base
 			ar & const_cast< kep_toolbox::sims_flanagan::spacecraft &>(m_spacecraft);*/
 		}
 		const int						m_n_seg;
-		std::vector<kep_toolbox::planet::gtoc7>			m_asteroids;
+		const kep_toolbox::planet::planet_ptr		        m_ast0;
+		const kep_toolbox::planet::planet_ptr		        m_ast1;
 		mutable kep_toolbox::sims_flanagan::leg			m_leg;
 		const kep_toolbox::epoch				m_t0;
 		const kep_toolbox::epoch				m_t1;		
