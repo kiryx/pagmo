@@ -55,7 +55,7 @@ namespace pagmo { namespace problem {
  * @see problem::base constructors.
  */
 
-pl2pl_fixed_time::pl2pl_fixed_time(int ast0, int ast1, epoch t0, epoch t1, spacecraft S, int n_seg):
+pl2pl_fixed_time::pl2pl_fixed_time(const planet::planet_ptr ast0,const planet::planet_ptr ast1,const epoch t0,const epoch t1,const spacecraft S,const int n_seg):
 	base(3 * n_seg + 1,0,1,n_seg + 7, n_seg, 1E-5),
 	m_n_seg(n_seg),m_t0(t0),m_t1(t1),m_spacecraft(S)
 {

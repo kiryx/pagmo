@@ -55,8 +55,8 @@ class __PAGMO_VISIBLE pl2pl_fixed_time: public base
 {
 	public:
 		/// Constructor
-		pl2pl_fixed_time(int = 815, int = 300, kep_toolbox::epoch = 56800, kep_toolbox::epoch = 56900,
- kep_toolbox::sims_flanagan::spacecraft = kep_toolbox::sims_flanagan::spacecraft(2000,0.3,3000), int = 5);
+		pl2pl_fixed_time(const kep_toolbox::planet::planet_ptr = kep_toolbox::planet::jpl_lp("earth").clone(),const kep_toolbox::planet::planet_ptr = kep_toolbox::planet::jpl_lp("mars").clone(),const kep_toolbox::epoch = kep_toolbox::epoch(0),const kep_toolbox::epoch = kep_toolbox::epoch(1000),const
+ kep_toolbox::sims_flanagan::spacecraft = kep_toolbox::sims_flanagan::spacecraft(2000,0.3,3000),const int = 5);
 		base_ptr clone() const;
 		std::string get_name() const;
 		std::string pretty(const std::vector<double> &x) const;
