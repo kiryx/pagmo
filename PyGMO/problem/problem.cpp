@@ -390,7 +390,8 @@ BOOST_PYTHON_MODULE(_problem) {
 
 	// Planet to Planet, fixed time.
 	problem_wrapper<problem::pl2pl_fixed_time>("pl2pl_fixed_time","Planet to Planet fixed time.")
-		.def(init<optional<int,int,kep_toolbox::epoch,kep_toolbox::epoch,kep_toolbox::sims_flanagan::spacecraft,int> >());
+		.def(init<optional<const kep_toolbox::planet::planet_ptr, const kep_toolbox::planet::planet_ptr, const kep_toolbox::epoch, const kep_toolbox::epoch, const kep_toolbox::sims_flanagan::spacecraft, const int> >())
+	.add_property("high_fidelity", &problem::pl2pl_fixed_time::get_high_fidelity, &problem::pl2pl_fixed_time::set_high_fidelity);
 
 	// SCH
 	problem_wrapper<problem::sch>("sch","Shaffer's study problem.");
