@@ -1,4 +1,5 @@
 from PyGMO.problem._problem_space import cassini_1, gtoc_1, gtoc_2, cassini_2, rosetta, messenger_full, tandem, laplace, sagas, mga_1dsm_alpha, mga_1dsm_tof, mga_incipit, mga_incipit_cstrs, mga_part, _gtoc_2_objective
+from PyGMO.problem._problem import pl2pl_fixed_time
 
 # Redefining the constructors of all problems to obtain good documentation
 # and allowing kwargs
@@ -25,41 +26,6 @@ def _cassini_1_ctor(self, objectives=1):
     self._orig_init(*arg_list)
 cassini_1._orig_init = cassini_1.__init__
 cassini_1.__init__ = _cassini_1_ctor
-
-
-def _pl2pl_fixed_time(self, ast0=jpl_lp('earth'), ast1=jpl_lp('mars'), t0=epoch(0),
-    t1=epoch(1000), sc=spacecraft(2000, 0.3, 3000), n_seg=5):
-    """
-    Constructs a Planet 2 Planet problem with fixed time.
-    Chromosome is defined as:
-
-    x = [m_f, Th_0_x, Th_0_y, Th_0_z, .., Th_n_x, Th_n_y, Th_n_z]
-    , where 'm_f' is the final mass, while 'Th_i_j' is the throttle component in direction 'j' (x,y,z) for the 'i'-th segment.
-
-    USAGE: problem.pl2pl_fixed_time(ast0=gtoc7(1000), ast1=gtoc7(1000), t0=epoch(3000),
-               t1=epoch(4000), sc=spacecraft(2000, 0.3, 3000), n_seg = 5)
-
-    * ast0: first planet
-    * ast0: second planet
-    * t0: departure epoch (from planet ast0)
-    * t1: arrival epoch (to planet ast1)
-    * sc: spacecraft object
-    * n_seg: number of segments
-
-    """
-
-    # We construct the arg list for the original constructor exposed by
-    # boost_python
-    arg_list = []
-    arg_list.append(ast0)
-    arg_list.append(ast1)
-    arg_list.append(t0)
-    arg_list.append(t1)
-    arg_list.append(sc)
-    arg_list.append(n_seg)
-    self._orig_init(*arg_list)
-pl2pl_fixed_time._orig_init = pl2pl_fixed_time.__init__
-pl2pl_fixed_time.__init__ = _pl2pl_fixed_time
 
 
 def _gtoc_1_ctor(self):
@@ -234,8 +200,6 @@ def _gtoc_2_ctor(self, ast1=815, ast2=300, ast3=110, ast4=47, n_seg=10, objectiv
     arg_list.append(ast1)
     arg_list.append(ast2)
     arg_list.append(ast3)
-    arg_list.append(ast4)
-    arg_list.append(n_seg)
     arg_list.append(objective)
     self._orig_init(*arg_list)
 gtoc_2._orig_init = gtoc_2.__init__
@@ -243,7 +207,43 @@ gtoc_2.__init__ = _gtoc_2_ctor
 
 
 from PyKEP.core._core import epoch
-from PyKEP.planet import jpl_lp, gtoc6
+from PyKEP.planet import jpl_lp, gtoc6, gtoc7
+from PyKEP.sims_flanagan import spacecraft
+
+
+def _pl2pl_fixed_time_ctor(self, ast0=gtoc7(7422), ast1=gtoc7(14254), t0=epoch(9818),
+    t1=epoch(10118), sc=spacecraft(2000, 0.3, 3000), n_seg=5):
+    """
+    Constructs a Planet 2 Planet problem with fixed time.
+    Chromosome is defined as:
+
+    x = [m_f, Th_0_x, Th_0_y, Th_0_z, .., Th_n_x, Th_n_y, Th_n_z]
+    , where 'm_f' is the final mass, while 'Th_i_j' is the throttle component in direction 'j' (x,y,z) for the 'i'-th segment.
+
+    USAGE: problem.pl2pl_fixed_time(ast0=gtoc7(7422), ast1=gtoc7(14254), t0=epoch(9818),
+               t1=epoch(10118), sc=spacecraft(2000, 0.3, 3000), n_seg = 5)
+
+    * ast0: first planet
+    * ast0: second planet
+    * t0: departure epoch (from planet ast0)
+    * t1: arrival epoch (to planet ast1)
+    * sc: spacecraft object
+    * n_seg: number of segments
+
+    """
+
+    # We construct the arg list for the original constructor exposed by
+    # boost_python
+    arg_list = []
+    arg_list.append(ast0)
+    arg_list.append(ast1)
+    arg_list.append(t0)
+    arg_list.append(t1)
+    arg_list.append(sc)
+    arg_list.append(n_seg)
+    self._orig_init(*arg_list)
+pl2pl_fixed_time._orig_init = pl2pl_fixed_time.__init__
+pl2pl_fixed_time.__init__ = _pl2pl_fixed_time_ctor
 
 
 def _mga_1dsm_alpha_ctor(
@@ -965,4 +965,4 @@ def _mga_1dsm_tof_plot(self, x):
     return axis
 mga_1dsm_tof.plot = _mga_1dsm_tof_plot
 
-del gtoc6, jpl_lp
+del gtoc6, gtoc7, jpl_lp, spacecraft
