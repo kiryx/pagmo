@@ -62,6 +62,10 @@ class __PAGMO_VISIBLE pl2pl_fixed_time: public base
 		std::string pretty(const std::vector<double> &x) const;
 		bool get_high_fidelity() const;
 		void set_high_fidelity(bool hf_option);
+		std::vector<kep_toolbox::planet::planet_ptr> get_sequence() const;
+		kep_toolbox::sims_flanagan::leg get_leg() const;
+		kep_toolbox::epoch get_t0() const;
+		kep_toolbox::epoch get_t1() const;
 	protected:
 		void objfun_impl(fitness_vector &, const decision_vector &) const;
 		void compute_constraints_impl(constraint_vector &, const decision_vector &) const;

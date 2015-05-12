@@ -99,6 +99,24 @@ void pl2pl_fixed_time::objfun_impl(fitness_vector &f, const decision_vector &x) 
 	f[0] = -x[0];
 }
 
+std::vector<kep_toolbox::planet::planet_ptr> pl2pl_fixed_time::get_sequence() const {
+	std::vector<kep_toolbox::planet::planet_ptr> seq;
+	seq.push_back(m_ast0);
+	seq.push_back(m_ast1);
+	return seq;
+}
+
+kep_toolbox::sims_flanagan::leg pl2pl_fixed_time::get_leg() const {
+	return m_leg;
+}
+
+kep_toolbox::epoch pl2pl_fixed_time::get_t0() const {
+	return m_t0;
+}
+kep_toolbox::epoch pl2pl_fixed_time::get_t1() const {
+	return m_t1;
+}
+
 void pl2pl_fixed_time::compute_constraints_impl(constraint_vector &c, const decision_vector &x) const
 {
 	// Cached values.
