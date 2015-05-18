@@ -403,6 +403,37 @@ def _mga_part_ctor(
 mga_part._orig_init = mga_part.__init__
 mga_part.__init__ = _mga_part_ctor
 
+
+
+def _pl2pl_fixed_time_plot(self, x):
+    from PyGMO import problem, algorithm, population
+    from PyKEP import lambert_problem, AU
+    from PyKEP.orbit_plots import plot_planet, plot_sf_leg
+    from PyKEP import phasing
+    import matplotlib.pyplot as plt
+    import matplotlib as mpl
+    from mpl_toolkits.mplot3d import Axes3D
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+
+    ax.scatter(0, 0, 0, color='y')
+    ast1, ast2 = self.get_sequence()
+    leg = self.get_leg()
+    t_i = self.get_t0()
+    t_f = self.get_t1()
+
+    # Plot asteroid orbits
+    plot_planet(ast1, t0=t_i, color=(0.8, 0.6, 0.4), legend=True, units=AU, ax=ax)
+    plot_planet(ast2, t0=t_f, color=(0.8, 0.6, 0.8), legend=True, units=AU, ax=ax)
+
+    # Plot Sims-Flanagan leg
+    plot_sf_leg(leg, units=AU, N=10, ax=ax)
+
+    return ax
+pl2pl_fixed_time.plot = _pl2pl_fixed_time_plot
+
+
 # Plot of the trajectory for an mga_1dsm problem
 
 

@@ -39,7 +39,7 @@ using namespace kep_toolbox;
 using namespace kep_toolbox::sims_flanagan;
 
 namespace pagmo { namespace problem {
-
+	
 /// Problem Constructor
 /**
  * Constructs a pl2pl_fixed_time problem
@@ -79,7 +79,7 @@ pl2pl_fixed_time::pl2pl_fixed_time(const planet::planet_ptr ast0,const planet::p
 	decision_vector lb_v, ub_v;
 	// Mass.
 	//lb_v.push_back(std::max(initial_mass-(t1-t0)*ASTRO_DAY2SEC/m_spacecraft.get_isp(),5));
-	lb_v.push_back(800);
+	lb_v.push_back(5);
 	ub_v.push_back(initial_mass);
 	// Throttles.
 	for (int i = 0; i < 3 * n_seg; ++i) {
