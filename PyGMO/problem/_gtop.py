@@ -212,7 +212,7 @@ from PyKEP.sims_flanagan import spacecraft
 
 
 def _pl2pl_fixed_time_ctor(self, ast0=gtoc7(7422), ast1=gtoc7(14254), t0=epoch(9818),
-    t1=epoch(10118), sc=spacecraft(2000, 0.3, 3000), n_seg=5):
+    t1=epoch(10118), sc=spacecraft(2000, 0.3, 3000), n_seg=5, obj="fin_m"):
     """
     Constructs a Planet 2 Planet problem with fixed time.
     Chromosome is defined as:
@@ -234,6 +234,13 @@ def _pl2pl_fixed_time_ctor(self, ast0=gtoc7(7422), ast1=gtoc7(14254), t0=epoch(9
 
     # We construct the arg list for the original constructor exposed by
     # boost_python
+    from PyGMO.problem._problem import _pl2pl2_fixed_time_objective
+    def objective(x):
+        return {
+            "fin_m": _pl2pl2_fixed_time_objective.FIN_M,
+            "crit_m": _pl2pl2_fixed_time_objective.FIN_INI_M
+        }[x]
+
     arg_list = []
     arg_list.append(ast0)
     arg_list.append(ast1)
@@ -241,6 +248,7 @@ def _pl2pl_fixed_time_ctor(self, ast0=gtoc7(7422), ast1=gtoc7(14254), t0=epoch(9
     arg_list.append(t1)
     arg_list.append(sc)
     arg_list.append(n_seg)
+    arg_list.append(objective(obj))
     self._orig_init(*arg_list)
 pl2pl_fixed_time._orig_init = pl2pl_fixed_time.__init__
 pl2pl_fixed_time.__init__ = _pl2pl_fixed_time_ctor
@@ -407,7 +415,7 @@ mga_part.__init__ = _mga_part_ctor
 
 def _pl2pl_fixed_time_plot(self, x):
     from PyGMO import problem, algorithm, population
-    from PyKEP import lambert_problem, AU
+    from PyKEP import sims_flanagan, AU
     from PyKEP.orbit_plots import plot_planet, plot_sf_leg
     from PyKEP import phasing
     import matplotlib.pyplot as plt
@@ -423,12 +431,24 @@ def _pl2pl_fixed_time_plot(self, x):
     t_i = self.get_t0()
     t_f = self.get_t1()
 
+    # Get initial sc state
+    sc = leg.get_spacecraft()
+    r, v = ast1.eph(t_i)
+    xi = sims_flanagan.sc_state(r, v, sc.mass)
+
+    # Get final sc state
+    r, v = ast2.eph(t_f)
+    xf = sims_flanagan.sc_state(r, v, x[0])
+
+    # Update leg with final sc state and throttles
+    leg.set(t_i, xi, x[1:], t_f, xf)
+
     # Plot asteroid orbits
     plot_planet(ast1, t0=t_i, color=(0.8, 0.6, 0.4), legend=True, units=AU, ax=ax)
     plot_planet(ast2, t0=t_f, color=(0.8, 0.6, 0.8), legend=True, units=AU, ax=ax)
 
     # Plot Sims-Flanagan leg
-    plot_sf_leg(leg, units=AU, N=10, ax=ax)
+    plot_sf_leg(leg, units=AU, N=50, ax=ax)
 
     return ax
 pl2pl_fixed_time.plot = _pl2pl_fixed_time_plot

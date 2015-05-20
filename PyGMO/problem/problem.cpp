@@ -390,12 +390,17 @@ BOOST_PYTHON_MODULE(_problem) {
 
 	// Planet to Planet, fixed time.
 	problem_wrapper<problem::pl2pl_fixed_time>("pl2pl_fixed_time","Planet to Planet fixed time.")
-		.def(init<optional<const kep_toolbox::planet::planet_ptr, const kep_toolbox::planet::planet_ptr, const kep_toolbox::epoch, const kep_toolbox::epoch, const kep_toolbox::sims_flanagan::spacecraft, const int> >())
+		.def(init<optional<const kep_toolbox::planet::planet_ptr, const kep_toolbox::planet::planet_ptr, const kep_toolbox::epoch, const kep_toolbox::epoch, const kep_toolbox::sims_flanagan::spacecraft, const int, const problem::pl2pl_fixed_time::objective> >())
 		.add_property("high_fidelity", &problem::pl2pl_fixed_time::get_high_fidelity, &problem::pl2pl_fixed_time::set_high_fidelity)
 		.def("get_leg", &problem::pl2pl_fixed_time::get_leg, "Returns the SF leg")
 		.def("get_t0", &problem::pl2pl_fixed_time::get_t0, "Returns the T_0")
 		.def("get_t1", &problem::pl2pl_fixed_time::get_t1, "Returns the T_1")
 		.def("get_sequence", &problem::pl2pl_fixed_time::get_sequence, "Returns the asteroids");
+
+	// Planet to Planet's objectives enum.
+	enum_<problem::pl2pl_fixed_time::objective>("_pl2pl2_fixed_time_objective")
+		.value("FIN_M",problem::pl2pl_fixed_time::FIN_M)
+		.value("FIN_INI_M",problem::pl2pl_fixed_time::FIN_INI_M);
 
 	// SCH
 	problem_wrapper<problem::sch>("sch","Shaffer's study problem.");

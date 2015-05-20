@@ -55,16 +55,14 @@ namespace pagmo { namespace problem {
  * @see problem::base constructors.
  */
 
-pl2pl_fixed_time::pl2pl_fixed_time(const planet::planet_ptr ast0,const planet::planet_ptr ast1,const epoch t0,const epoch t1,const spacecraft S,const int n_seg):
-	base(3 * n_seg + 1,0,1,n_seg + 7, n_seg, 1E-5),
-	m_ast0(ast0), m_ast1(ast1), m_t0(t0), m_t1(t1), m_spacecraft(S), m_n_seg(n_seg)
+pl2pl_fixed_time::pl2pl_fixed_time(const planet::planet_ptr ast0,const planet::planet_ptr ast1,const epoch t0,const epoch t1,const spacecraft S,const int n_seg,const objective obj):
+	base(3 * n_seg + 2,0,1,n_seg + 7, n_seg, 1E-5),
+	m_ast0(ast0), m_ast1(ast1), m_t0(t0), m_t1(t1), m_spacecraft(S), m_n_seg(n_seg), m_obj(obj)
 {
 	if (n_seg <= 0) {
 		pagmo_throw(value_error,"invalid number of segments");
 	}
 	
-	array3D r, v;
-	double initial_mass = m_spacecraft.get_mass();
 	// Build leg.
 	m_leg.set_spacecraft(m_spacecraft);
 	m_leg.set_mu(ASTRO_MU_SUN);
@@ -72,15 +70,29 @@ pl2pl_fixed_time::pl2pl_fixed_time(const planet::planet_ptr ast0,const planet::p
 	m_leg.set_t_i(t0);
 	m_leg.set_t_f(t1);
 	m_leg.set_high_fidelity(true);
-	// Initial state.
-	m_ast0->eph(m_t0,r,v);
-	m_leg.set_x_i(sc_state(r,v,initial_mass));
 
 	decision_vector lb_v, ub_v;
 	// Mass.
+	double initial_mass = m_spacecraft.get_mass();
 	//lb_v.push_back(std::max(initial_mass-(t1-t0)*ASTRO_DAY2SEC/m_spacecraft.get_isp(),5));
-	lb_v.push_back(5);
-	ub_v.push_back(initial_mass);
+	switch (m_obj){
+		case FIN_M:
+			//Final mass
+			lb_v.push_back(5);
+			ub_v.push_back(initial_mass);
+			//Initial mass
+			lb_v.push_back(initial_mass-0.1);
+			ub_v.push_back(initial_mass);
+			break;
+		case FIN_INI_M:
+			//Final mass
+			lb_v.push_back(5);
+			ub_v.push_back(10000);
+			//Initial mass
+			lb_v.push_back(500);
+			ub_v.push_back(10000);
+
+	}
 	// Throttles.
 	for (int i = 0; i < 3 * n_seg; ++i) {
 		lb_v.push_back(-1);
@@ -123,8 +135,13 @@ void pl2pl_fixed_time::compute_constraints_impl(constraint_vector &c, const deci
 	array3D r, v;
 	// Build leg.
 	for (int j = 0; j < m_n_seg; ++j) {
-		m_leg.set_throttles(j,get_nth_throttle(j,x.begin() + 1,m_t0,m_t1));
+		m_leg.set_throttles(j,get_nth_throttle(j,x.begin() + 2,m_t0,m_t1));
 	}
+	// Initial state.
+	double initial_mass = x[1];
+	m_ast0->eph(m_t0,r,v);
+	m_leg.set_x_i(sc_state(r,v,initial_mass));
+
 	// Final state.
 	double final_mass = x[0];
 	m_ast1->eph(m_t1,r,v);

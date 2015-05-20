@@ -54,9 +54,11 @@ namespace pagmo { namespace problem {
 class __PAGMO_VISIBLE pl2pl_fixed_time: public base
 {
 	public:
+		/// The objective can be defined as maximizing final mass or additionally maximizing initial mass
+		enum objective {FIN_M, FIN_INI_M};
 		/// Constructor
 		pl2pl_fixed_time(const kep_toolbox::planet::planet_ptr = kep_toolbox::planet::jpl_lp("earth").clone(),const kep_toolbox::planet::planet_ptr = kep_toolbox::planet::jpl_lp("mars").clone(),const kep_toolbox::epoch = kep_toolbox::epoch(0),const kep_toolbox::epoch = kep_toolbox::epoch(1000),const
- kep_toolbox::sims_flanagan::spacecraft = kep_toolbox::sims_flanagan::spacecraft(2000,0.3,3000),const int = 5);
+ kep_toolbox::sims_flanagan::spacecraft = kep_toolbox::sims_flanagan::spacecraft(2000,0.3,3000),const int = 5,const objective = FIN_M);
 		base_ptr clone() const;
 		std::string get_name() const;
 		std::string pretty(const std::vector<double> &x) const;
@@ -94,12 +96,13 @@ class __PAGMO_VISIBLE pl2pl_fixed_time: public base
 			ar & m_t1;
 			ar & const_cast< kep_toolbox::sims_flanagan::spacecraft &>(m_spacecraft);*/
 		}
-		const kep_toolbox::planet::planet_ptr		        m_ast0;
-		const kep_toolbox::planet::planet_ptr		        m_ast1;
-		const kep_toolbox::epoch				m_t0;
-		const kep_toolbox::epoch				m_t1;		
-		const kep_toolbox::sims_flanagan::spacecraft		m_spacecraft;
-		const int						m_n_seg;
+		const kep_toolbox::planet::planet_ptr		    m_ast0;
+		const kep_toolbox::planet::planet_ptr		    m_ast1;
+		const kep_toolbox::epoch						m_t0;
+		const kep_toolbox::epoch						m_t1;		
+		const kep_toolbox::sims_flanagan::spacecraft	m_spacecraft;
+		const int										m_n_seg;
+		const objective									m_obj;
 		mutable kep_toolbox::sims_flanagan::leg			m_leg;
 };
 
