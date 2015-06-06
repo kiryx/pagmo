@@ -42,40 +42,38 @@ namespace pagmo{ namespace problem {
 
 bbob2015::bbob2015(unsigned int problem_number, problem::base::size_type dim):base_stochastic(dim,0)
 {
-	m_problem_number = problem_number;
-	m_dim=dim;
+    m_problem_number = problem_number;
+    m_dim=dim;
 
-	if (problem_number < handlesLength )
-		m_actFunc = handles[problem_number-1];
-	else if( (100 < problem_number) && (problem_number-101 < handlesNoisyLength) )
-		m_actFunc = handlesNoisy[problem_number - 101];
-	else
-		pagmo_throw(value_error, "problem_number specified is not a valid function of BBOB testbed");
+    if (problem_number < handlesLength )
+        m_actFunc = handles[problem_number-1];
+    else if( (100 < problem_number) && (problem_number-101 < handlesNoisyLength) )
+        m_actFunc = handlesNoisy[problem_number - 101];
+    else
+        pagmo_throw(value_error, "problem_number specified is not a valid function of BBOB testbed");
 
-	//All bbob problems have same bounds.
-	set_bounds(-5,5);
+    //All bbob problems have same bounds.
+    set_bounds(-5,5);
 }
 
 std::string bbob2015::get_name() const
 {
-	std::string retval("BBOB2015");
-	retval.append(boost::lexical_cast<std::string>(m_problem_number));
+    std::string retval("BBOB2015");
+    retval.append(boost::lexical_cast<std::string>(m_problem_number));
 
-	return retval;
+    return retval;
 }
 
 void bbob2015::objfun_impl(fitness_vector &f, const decision_vector &x) const
 {
-	decision_vector::size_type n = x.size();
-	bbob2015::TwoDoubles res;
+    decision_vector::size_type n = x.size();
+    bbob2015::TwoDoubles res;
+    if(n != m_dim)
+        pagmo_throw(value_error, "Dimension mismatch");
+    res = (this->*m_actFunc)(x);
 
-	if(n != m_dim)
-		pagmo_throw(value_error, "Dimension mismatch");
-
-	res = (this->*m_actFunc)(x);
-
-	f[0] = res.Fval;
-	return;
+    f[0] = res.Fval;
+    return;
 }
 
 /* set the m_seed for the noise.
@@ -83,32 +81,32 @@ void bbob2015::objfun_impl(fitness_vector &f, const decision_vector &x) const
  */
 void bbob2015::setNoiseSeed(unsigned int _seed, unsigned int _seedn) const
 {
-	m_seed = _seed;
-	m_seedn = _seedn;
+    m_seed = _seed;
+    m_seedn = _seedn;
 }
 
 void bbob2015::unif(std::vector<double> &r, unsigned int N, unsigned int inseed) const
 {
-	/* generates N uniform numbers with starting seed*/
-	int aktseed;
-	int i, tmp;
-	int rgrand[32];
-	unsigned int k, aktrand;
+    /* generates N uniform numbers with starting seed*/
+    int aktseed;
+    int i, tmp;
+    int rgrand[32];
+    unsigned int k, aktrand;
 
-	if (inseed < 1)
-		inseed = 1;
-	aktseed = inseed;
+    if (inseed < 1)
+        inseed = 1;
+    aktseed = inseed;
 
     for (i = 39; i >= 0; i--)
     {
-		tmp = (int)floor((double)aktseed/(double)127773);
-		aktseed = 16807  * (aktseed - tmp * 127773) - 2836 * tmp;
-		if (aktseed < 0)
-			aktseed = aktseed + 2147483647;
-		if (i < 32)
-			rgrand[i] = aktseed;
-	}
-	aktrand = rgrand[0];
+        tmp = (int)floor((double)aktseed/(double)127773);
+        aktseed = 16807  * (aktseed - tmp * 127773) - 2836 * tmp;
+        if (aktseed < 0)
+            aktseed = aktseed + 2147483647;
+        if (i < 32)
+            rgrand[i] = aktseed;
+    }
+    aktrand = rgrand[0];
 
     for (k = 0; k < N; k++)
     {
@@ -188,7 +186,7 @@ void bbob2015::reshape(std::vector<std::vector<double>> &B, const std::vector<do
             B[i][j] = vector[j * m + i];
         }
     }
-	return;
+    return;
 }
 
 void bbob2015::computeRotation(std::vector<std::vector<double>> &B, unsigned int seed, unsigned int _DIM) const
@@ -224,7 +222,7 @@ void bbob2015::computeRotation(std::vector<std::vector<double>> &B, unsigned int
             B[k][i] /= sqrt(prod);
         }
     }
-	return;
+    return;
 }
 
 double bbob2015::myrand(void) const
@@ -250,7 +248,7 @@ double bbob2015::FGauss(double Ftrue, double beta) const
     double Fval = Ftrue * exp(beta * randn());
     Fval += 1.01 * TOL;
     if (Ftrue < TOL)
-{
+    {
         Fval = Ftrue;
     }
     return Fval;
@@ -261,7 +259,7 @@ double bbob2015::FUniform(double Ftrue, double alpha, double beta) const
     double Fval = pow(myrand(), beta) * Ftrue * fmax(1., pow(1e9/(Ftrue+1e-99), alpha * myrand()));
     Fval += 1.01 * TOL;
     if (Ftrue < TOL)
-{
+    {
         Fval = Ftrue;
     }
     return Fval;
@@ -279,11 +277,11 @@ double bbob2015::FCauchy(double Ftrue, double alpha, double p) const
 
     Fval += 1.01 * TOL;
     if (Ftrue < TOL)
-{
+    {
         Fval = Ftrue;
     }
     return Fval;
-}
+    }
 
 double bbob2015::computeFopt(int _funcId, int _m_trialid) const
 {
@@ -319,27 +317,27 @@ double bbob2015::computeFopt(int _funcId, int _m_trialid) const
 
 void bbob2015::initbenchmarks(void) const
 {
-	unsigned int i;
+    unsigned int i;
 
-	m_gval.resize(1);
-	m_gval2.resize(1);
-	m_gvect.resize(m_dim * m_dim);
+    m_gval.resize(1);
+    m_gval2.resize(1);
+    m_gvect.resize(m_dim * m_dim);
     m_uniftmp.resize(2 * m_dim * m_dim);
     m_tmpvect.resize(m_dim);
     m_Xopt.resize(m_dim);
 
     m_tmx.resize(m_dim);
-	m_rotation.resize(m_dim);
+    m_rotation.resize(m_dim);
     m_rot2.resize(m_dim);
-	m_linearTF.resize(m_dim);
+    m_linearTF.resize(m_dim);
 
-	m_peaks21.resize(m_dim * NHIGHPEAKS21);
-	m_rperm21.resize(fmax(m_dim, NHIGHPEAKS21 - 1));
+    m_peaks21.resize(m_dim * NHIGHPEAKS21);
+    m_rperm21.resize(fmax(m_dim, NHIGHPEAKS21 - 1));
     m_Xlocal21.resize(m_dim);
     m_arrScales21.resize(NHIGHPEAKS21);
 
-	m_peaks22.resize(m_dim * NHIGHPEAKS22);
-	m_rperm22.resize(fmax(m_dim, NHIGHPEAKS22 - 1));
+    m_peaks22.resize(m_dim * NHIGHPEAKS22);
+    m_rperm22.resize(fmax(m_dim, NHIGHPEAKS22 - 1));
     m_arrScales22.resize(NHIGHPEAKS22);
     m_Xlocal22.resize(m_dim);
 
@@ -352,10 +350,10 @@ void bbob2015::initbenchmarks(void) const
         m_Xlocal22[i].resize(NHIGHPEAKS22);
     }
 
-	for (i = 0; i < NHIGHPEAKS21; i++)
+    for (i = 0; i < NHIGHPEAKS21; i++)
         m_arrScales21[i].resize(m_dim);
 
-	for (i = 0; i < NHIGHPEAKS22; i++)
+    for (i = 0; i < NHIGHPEAKS22; i++)
         m_arrScales22[i].resize(m_dim);
 
     return;
@@ -517,7 +515,7 @@ bbob2015::TwoDoubles bbob2015::f4(const decision_vector &x) const
     Fadd = m_Fopt;
 
     for (i = 0; i < m_dim; i++)
-	{
+    {
         tmp = fabs(x[i]) - 5.;
         if (tmp > 0.)
             Fpen += tmp * tmp;
@@ -533,9 +531,9 @@ bbob2015::TwoDoubles bbob2015::f4(const decision_vector &x) const
     monotoneTFosc(m_tmx);
     for (i = 0; i < m_dim; i++)
     {
-        if (i % 2 == 0 && m_tmx[i] > 0)
-            m_tmx[i] = sqrt(alpha) * m_tmx[i];
-        m_tmx[i] = pow(sqrt(condition), ((double)i)/((double)(m_dim-1))) * m_tmx[i];
+    if (i % 2 == 0 && m_tmx[i] > 0)
+        m_tmx[i] = sqrt(alpha) * m_tmx[i];
+    m_tmx[i] = pow(sqrt(condition), ((double)i)/((double)(m_dim-1))) * m_tmx[i];
     }
     /* COMPUTATION core*/
     tmp = 0.;
@@ -590,7 +588,7 @@ bbob2015::TwoDoubles bbob2015::f5(const decision_vector &x) const
     /* BOUNDARY HANDLING*/
     /* move "too" good coordinates back into domain*/
     for (i = 0; i < m_dim; i++)
-	{
+    {
         if ((m_Xopt[i] == 5.) && (x[i] > 5))
             m_tmx[i] = 5.;
         else if ((m_Xopt[i] == -5.) && (x[i] < -5))
@@ -604,7 +602,7 @@ bbob2015::TwoDoubles bbob2015::f5(const decision_vector &x) const
     {
         if (m_Xopt[i] > 0)
             Ftrue -= pow(sqrt(alpha), ((double)i)/((double)(m_dim-1))) * m_tmx[i];
-		else
+        else
             Ftrue += pow(sqrt(alpha), ((double)i)/((double)(m_dim-1))) * m_tmx[i];
     }
     Ftrue += Fadd;
@@ -641,7 +639,7 @@ bbob2015::TwoDoubles bbob2015::f6(const decision_vector &x) const
             {
                 m_linearTF[i][j] = 0.;
                 for (k = 0; k < m_dim; k++)
-				{
+                {
                     m_linearTF[i][j] += m_rotation[i][k] * pow(sqrt(condition), ((double)k)/((double)(m_dim-1))) * m_rot2[k][j];
                 }
             }
@@ -653,11 +651,10 @@ bbob2015::TwoDoubles bbob2015::f6(const decision_vector &x) const
     /* BOUNDARY HANDLING*/
     /* TRANSFORMATION IN SEARCH SPACE*/
     for (i = 0; i < m_dim; i++)
-	{
-
+    {
         m_tmx[i] = 0.;
         for (j = 0; j < m_dim; j++)
-		{
+        {
             m_tmx[i] += m_linearTF[i][j] * (x[j] - m_Xopt[j]);
         }
     }
@@ -724,19 +721,18 @@ bbob2015::TwoDoubles bbob2015::f7(const decision_vector &x) const
 
     /* TRANSFORMATION IN SEARCH SPACE*/
     for (i = 0; i < m_dim; i++)
-	{
-
+    {
         m_tmpvect[i] = 0.;
         tmp = sqrt(pow(condition/10., ((double)i)/((double)(m_dim-1))));
         for (j = 0; j < m_dim; j++)
-		{
+        {
             m_tmpvect[i] += tmp * m_rot2[i][j] * (x[j] - m_Xopt[j]);
         }
     }
     x1 = m_tmpvect[0];
 
     for (i = 0; i < m_dim; i++)
-	{
+    {
         if (fabs(m_tmpvect[i]) > 0.5)
             m_tmpvect[i] = round(m_tmpvect[i]);
         else
@@ -744,10 +740,10 @@ bbob2015::TwoDoubles bbob2015::f7(const decision_vector &x) const
     }
 
     for (i = 0; i < m_dim; i++)
-	{
+    {
         m_tmx[i] = 0.;
         for (j = 0; j < m_dim; j++)
-		{
+        {
             m_tmx[i] += m_rotation[i][j] * m_tmpvect[j];
         }
     }
@@ -795,7 +791,7 @@ bbob2015::TwoDoubles bbob2015::f8(const decision_vector &x) const
 
     /* TRANSFORMATION IN SEARCH SPACE*/
     for (i = 0; i < m_dim; i++)
-	{
+    {
         m_tmx[i] = scales * (x[i] - m_Xopt[i]) + 1;
     }
 
@@ -850,10 +846,10 @@ bbob2015::TwoDoubles bbob2015::f9(const decision_vector &x) const
 
     /* TRANSFORMATION IN SEARCH SPACE*/
     for (i = 0; i < m_dim; i++)
-	{
+    {
         m_tmx[i] = 0.5;
         for (j = 0; j < m_dim; j++)
-		{
+        {
             m_tmx[i] += m_linearTF[i][j] * x[j];
         }
     }
@@ -867,7 +863,7 @@ bbob2015::TwoDoubles bbob2015::f9(const decision_vector &x) const
     Ftrue *= 1e2;
     for (i = 0; i < m_dim - 1; i ++)
     {
-       tmp = (m_tmx[i] - 1.);
+        tmp = (m_tmx[i] - 1.);
         Ftrue += tmp * tmp;
     }
 
@@ -906,7 +902,7 @@ bbob2015::TwoDoubles bbob2015::f10(const decision_vector &x) const
     {
         m_tmx[i] = 0.;
         for (j = 0; j < m_dim; j++)
-		{
+        {
             m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
         }
     }
@@ -952,7 +948,7 @@ bbob2015::TwoDoubles bbob2015::f11(const decision_vector &x) const
     {
         m_tmx[i] = 0.;
         for (j = 0; j < m_dim; j++)
-		{
+        {
             m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
         }
     }
@@ -1000,7 +996,7 @@ bbob2015::TwoDoubles bbob2015::f12(const decision_vector &x) const
     {
         m_tmpvect[i] = 0.;
         for (j = 0; j < m_dim; j++)
-		{
+        {
             m_tmpvect[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
         }
         if (m_tmpvect[i] > 0)
@@ -1013,7 +1009,7 @@ bbob2015::TwoDoubles bbob2015::f12(const decision_vector &x) const
     {
         m_tmx[i] = 0.;
         for (j = 0; j < m_dim; j++)
-		{
+        {
             m_tmx[i] += m_rotation[i][j] * m_tmpvect[j];
         }
     }
@@ -1064,7 +1060,7 @@ bbob2015::TwoDoubles bbob2015::f13(const decision_vector &x) const
             }
         }
         m_isInitDone = 1;
-    }
+        }
     Fadd = m_Fopt;
     /* BOUNDARY HANDLING*/
 
@@ -1073,7 +1069,7 @@ bbob2015::TwoDoubles bbob2015::f13(const decision_vector &x) const
     {
         m_tmx[i] = 0.;
         for (j = 0; j < m_dim; j++)
-		{
+        {
             m_tmx[i] += m_linearTF[i][j] * (x[j] - m_Xopt[j]);
         }
     }
@@ -1121,7 +1117,7 @@ bbob2015::TwoDoubles bbob2015::f14(const decision_vector &x) const
     {
         m_tmx[i] = 0.;
         for (j = 0; j < m_dim; j++)
-		{
+        {
             m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
         }
     }
@@ -1166,7 +1162,7 @@ bbob2015::TwoDoubles bbob2015::f15(const decision_vector &x) const
             {
                 m_linearTF[i][j] = 0.;
                 for (k = 0; k < m_dim; k++)
-				{
+                {
                     m_linearTF[i][j] += m_rotation[i][k] * pow(sqrt(condition), ((double)k)/((double)(m_dim-1))) * m_rot2[k][j];
                 }
             }
@@ -1242,7 +1238,7 @@ bbob2015::TwoDoubles bbob2015::f16(const decision_vector &x) const
             {
                 m_linearTF[i][j] = 0.;
                 for (k = 0; k < m_dim; k++)
-				{
+                {
                     m_linearTF[i][j] += m_rotation[i][k] * pow(1./sqrt(condition), ((double)k)/((double)(m_dim-1))) * m_rot2[k][j];
                 }
             }
@@ -1488,10 +1484,10 @@ bbob2015::TwoDoubles bbob2015::f19(const decision_vector &x) const
 
     /* TRANSFORMATION IN SEARCH SPACE*/
     for (i = 0; i < m_dim; i++)
-	{
+    {
         m_tmx[i] = 0.5;
         for (j = 0; j < m_dim; j++)
-		{
+        {
             m_tmx[i] += m_linearTF[i][j] * x[j];
         }
     }
@@ -1546,7 +1542,7 @@ bbob2015::TwoDoubles bbob2015::f20(const decision_vector &x) const
     {
         m_tmpvect[i] = 2. * x[i];
         if (m_Xopt[i] < 0.)
-            m_tmpvect[i] *= -1.;
+        m_tmpvect[i] *= -1.;
     }
 
     m_tmx[0] = m_tmpvect[0];
@@ -1615,7 +1611,6 @@ bbob2015::TwoDoubles bbob2015::f21(const decision_vector &x) const
         for (i = 0; i < NHIGHPEAKS21 - 1; i++)
             m_rperm[i] = i;
 
-
         std::sort(m_rperm.begin(), m_rperm.begin() + NHIGHPEAKS21 - 1, compare_doubles(*this));
 
         /* Random permutation*/
@@ -1633,7 +1628,7 @@ bbob2015::TwoDoubles bbob2015::f21(const decision_vector &x) const
             for (j = 0; j < m_dim; j++)
                 m_rperm[j] = j;
 
-			std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
+            std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
 
             for (j = 0; j < m_dim; j++)
             {
@@ -1743,9 +1738,9 @@ bbob2015::TwoDoubles bbob2015::f22(const decision_vector &x) const
         unif(m_peaks, NHIGHPEAKS22 - 1, rseed);
         m_rperm = m_rperm22;
         for (i = 0; i < NHIGHPEAKS22 - 1; i++)
-            m_rperm[i] = i;
+        m_rperm[i] = i;
 
-		std::sort(m_rperm.begin(), m_rperm.begin() + NHIGHPEAKS22 - 1, compare_doubles(*this));
+        std::sort(m_rperm.begin(), m_rperm.begin() + NHIGHPEAKS22 - 1, compare_doubles(*this));
 
         /* Random permutation*/
         arrCondition[0] = maxcondition;
@@ -1762,9 +1757,9 @@ bbob2015::TwoDoubles bbob2015::f22(const decision_vector &x) const
             for (j = 0; j < m_dim; j++)
                 m_rperm[j] = j;
 
-			std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
+            std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
 
-			for (j = 0; j < m_dim; j++)
+            for (j = 0; j < m_dim; j++)
             {
                 m_arrScales[i][j] = pow(arrCondition[i], ((double)m_rperm[j])/((double)(m_dim-1)) - 0.5);
             }
@@ -1895,13 +1890,13 @@ bbob2015::TwoDoubles bbob2015::f23(const decision_vector &x) const
 
     /* TRANSFORMATION IN SEARCH SPACE*/
     for (i = 0; i < m_dim; i++)
-	{
-    	m_tmx[i] = 0.;
-		for (j = 0; j < m_dim; j++)
-		{
-			m_tmx[i] += m_linearTF[i][j] * (x[j] - m_Xopt[j]);
-		}
-	}
+    {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++)
+        {
+            m_tmx[i] += m_linearTF[i][j] * (x[j] - m_Xopt[j]);
+        }
+    }
 
     /* COMPUTATION core*/
     for (i = 0; i < m_dim; i++)
@@ -1961,7 +1956,7 @@ bbob2015::TwoDoubles bbob2015::f24(const decision_vector &x) const
             {
                 m_linearTF[i][j] = 0.;
                 for (k = 0; k < m_dim; k++)
-				{
+                {
                     m_linearTF[i][j] += m_rotation[i][k] * pow(sqrt(condition), ((double)k)/((double)(m_dim-1))) * m_rot2[k][j];
                 }
             }
@@ -2020,7 +2015,7 @@ bbob2015::TwoDoubles bbob2015::f101(const decision_vector &x) const
     /*sphere with moderate Gauss noise*/
 
     unsigned int i; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static unsigned int funcId = 101;
     static unsigned int rrseed = 1;
@@ -2068,7 +2063,7 @@ bbob2015::TwoDoubles bbob2015::f102(const decision_vector &x) const
     /* sphere with moderate uniform noise*/
 
     unsigned int i; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static unsigned int funcId = 102;
     static unsigned int rrseed = 1;
@@ -2115,7 +2110,7 @@ bbob2015::TwoDoubles bbob2015::f103(const decision_vector &x) const
     /* sphere with moderate Cauchy noise*/
 
     unsigned int i; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static unsigned int funcId = 103;
     static unsigned int rrseed = 1;
@@ -2162,7 +2157,7 @@ bbob2015::TwoDoubles bbob2015::f104(const decision_vector &x) const
     /* Rosenbrock non-rotated with moderate Gauss noise*/
 
     unsigned int i; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 104;
     static int rrseed = 8;
@@ -2193,7 +2188,8 @@ bbob2015::TwoDoubles bbob2015::f104(const decision_vector &x) const
     Fadd += 100. * Fpen;
 
     /* TRANSFORMATION IN SEARCH SPACE*/
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmx[i] = scales * (x[i] - 0.75 * m_Xopt[i]) + 1;
     }
 
@@ -2225,7 +2221,7 @@ bbob2015::TwoDoubles bbob2015::f105(const decision_vector &x) const
     /* Rosenbrock non-rotated with moderate uniform noise*/
 
     unsigned int i; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 105;
     static int rrseed = 8;
@@ -2256,7 +2252,8 @@ bbob2015::TwoDoubles bbob2015::f105(const decision_vector &x) const
     Fadd += 100. * Fpen;
 
     /* TRANSFORMATION IN SEARCH SPACE*/
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmx[i] = scales * (x[i] - 0.75 * m_Xopt[i]) + 1;
     }
 
@@ -2287,7 +2284,7 @@ bbob2015::TwoDoubles bbob2015::f106(const decision_vector &x) const
     /* Rosenbrock non-rotated with moderate Cauchy noise*/
 
     unsigned int i; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 106;
     static int rrseed = 8;
@@ -2318,7 +2315,8 @@ bbob2015::TwoDoubles bbob2015::f106(const decision_vector &x) const
     Fadd += 100. * Fpen;
 
     /* TRANSFORMATION IN SEARCH SPACE*/
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmx[i] = scales * (x[i] - 0.75 * m_Xopt[i]) + 1;
     }
 
@@ -2396,7 +2394,7 @@ bbob2015::TwoDoubles bbob2015::f108(const decision_vector &x) const
     /*sphere with uniform noise*/
 
     unsigned int i; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 108;
     static int rrseed = 1;
@@ -2443,7 +2441,7 @@ bbob2015::TwoDoubles bbob2015::f109(const decision_vector &x) const
     /*sphere with Cauchy noise*/
 
     unsigned int i; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 109;
     static int rrseed = 1;
@@ -2490,7 +2488,7 @@ bbob2015::TwoDoubles bbob2015::f110(const decision_vector &x) const
     /* Rosenbrock non-rotated with Gauss noise*/
 
     unsigned int i; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 110;
     static int rrseed = 8;
@@ -2521,7 +2519,8 @@ bbob2015::TwoDoubles bbob2015::f110(const decision_vector &x) const
     Fadd += 100. * Fpen;
 
     /* TRANSFORMATION IN SEARCH SPACE*/
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmx[i] = scales * (x[i] - 0.75 * m_Xopt[i]) + 1;
     }
 
@@ -2551,7 +2550,7 @@ bbob2015::TwoDoubles bbob2015::f111(const decision_vector &x) const
     /* Rosenbrock non-rotated with moderate uniform noise*/
 
     unsigned int i; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 111;
     static int rrseed = 8;
@@ -2582,7 +2581,8 @@ bbob2015::TwoDoubles bbob2015::f111(const decision_vector &x) const
     Fadd += 100. * Fpen;
 
     /* TRANSFORMATION IN SEARCH SPACE*/
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmx[i] = scales * (x[i] - 0.75 * m_Xopt[i]) + 1;
     }
 
@@ -2612,7 +2612,7 @@ bbob2015::TwoDoubles bbob2015::f112(const decision_vector &x) const
     /* Rosenbrock non-rotated with moderate Cauchy noise*/
 
     unsigned int i; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 112;
     static int rrseed = 8;
@@ -2643,7 +2643,8 @@ bbob2015::TwoDoubles bbob2015::f112(const decision_vector &x) const
     Fadd += 100. * Fpen;
 
     /* TRANSFORMATION IN SEARCH SPACE*/
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmx[i] = scales * (x[i] - 0.75 * m_Xopt[i]) + 1;
     }
 
@@ -2673,7 +2674,7 @@ bbob2015::TwoDoubles bbob2015::f113(const decision_vector &x) const
     /* step-ellipsoid with gauss noise, condition 100*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 113;
     static int rrseed = 7;
@@ -2706,15 +2707,18 @@ bbob2015::TwoDoubles bbob2015::f113(const decision_vector &x) const
     Fadd += 100. * Fpen;
 
     /* TRANSFORMATION IN SEARCH SPACE*/
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmpvect[i] = 0.;
         tmp = sqrt(pow(condition/10., ((double)i)/((double)(m_dim-1))));
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmpvect[i] += tmp * m_rot2[i][j] * (x[j] - m_Xopt[j]);
         }
     }
     x1 = m_tmpvect[0];
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         if (fabs(m_tmpvect[i]) > 0.5)
         {
             m_tmpvect[i] = round(m_tmpvect[i]);
@@ -2725,9 +2729,11 @@ bbob2015::TwoDoubles bbob2015::f113(const decision_vector &x) const
         }
     }
 
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmx[i] = 0.;
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmx[i] += m_rotation[i][j] * m_tmpvect[j];
         }
     }
@@ -2753,7 +2759,7 @@ bbob2015::TwoDoubles bbob2015::f114(const decision_vector &x) const
     /* step-ellipsoid with uniform noise, condition 100*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 114;
     static int rrseed = 7;
@@ -2786,15 +2792,18 @@ bbob2015::TwoDoubles bbob2015::f114(const decision_vector &x) const
     Fadd += 100. * Fpen;
 
     /* TRANSFORMATION IN SEARCH SPACE*/
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmpvect[i] = 0.;
         tmp = sqrt(pow(condition/10., ((double)i)/((double)(m_dim-1))));
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmpvect[i] += tmp * m_rot2[i][j] * (x[j] - m_Xopt[j]);
         }
     }
     x1 = m_tmpvect[0];
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         if (fabs(m_tmpvect[i]) > 0.5)
         {
             m_tmpvect[i] = round(m_tmpvect[i]);
@@ -2805,9 +2814,11 @@ bbob2015::TwoDoubles bbob2015::f114(const decision_vector &x) const
         }
     }
 
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmx[i] = 0.;
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmx[i] += m_rotation[i][j] * m_tmpvect[j];
         }
     }
@@ -2833,7 +2844,7 @@ bbob2015::TwoDoubles bbob2015::f115(const decision_vector &x) const
     /* step-ellipsoid with Cauchy noise, condition 100*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 115;
     static int rrseed = 7;
@@ -2866,15 +2877,18 @@ bbob2015::TwoDoubles bbob2015::f115(const decision_vector &x) const
     Fadd += 100. * Fpen;
 
     /* TRANSFORMATION IN SEARCH SPACE*/
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmpvect[i] = 0.;
         tmp = sqrt(pow(condition/10., ((double)i)/((double)(m_dim-1))));
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmpvect[i] += tmp * m_rot2[i][j] * (x[j] - m_Xopt[j]);
         }
     }
     x1 = m_tmpvect[0];
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         if (fabs(m_tmpvect[i]) > 0.5)
         {
             m_tmpvect[i] = round(m_tmpvect[i]);
@@ -2885,9 +2899,11 @@ bbob2015::TwoDoubles bbob2015::f115(const decision_vector &x) const
         }
     }
 
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmx[i] = 0.;
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmx[i] += m_rotation[i][j] * m_tmpvect[j];
         }
     }
@@ -2913,7 +2929,7 @@ bbob2015::TwoDoubles bbob2015::f116(const decision_vector &x) const
     /* ellipsoid with Gauss noise, monotone x-transformation, condition 1e4*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 116;
     static int rrseed = 10;
@@ -2947,7 +2963,8 @@ bbob2015::TwoDoubles bbob2015::f116(const decision_vector &x) const
     for (i = 0; i < m_dim; i++)
     {
         m_tmx[i] = 0.;
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
         }
     }
@@ -2974,7 +2991,7 @@ bbob2015::TwoDoubles bbob2015::f117(const decision_vector &x) const
     /* ellipsoid with uniform noise, monotone x-transformation, condition 1e4*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 117;
     static int rrseed = 10;
@@ -3008,7 +3025,8 @@ bbob2015::TwoDoubles bbob2015::f117(const decision_vector &x) const
     for (i = 0; i < m_dim; i++)
     {
         m_tmx[i] = 0.;
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
         }
     }
@@ -3035,7 +3053,7 @@ bbob2015::TwoDoubles bbob2015::f118(const decision_vector &x) const
     /* ellipsoid with Cauchy noise, monotone x-transformation, condition 1e4*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 118;
     static int rrseed = 10;
@@ -3069,7 +3087,8 @@ bbob2015::TwoDoubles bbob2015::f118(const decision_vector &x) const
     for (i = 0; i < m_dim; i++)
     {
         m_tmx[i] = 0.;
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
         }
     }
@@ -3096,7 +3115,7 @@ bbob2015::TwoDoubles bbob2015::f119(const decision_vector &x) const
     /* sum of different powers with Gauss Noise, between x^2 and x^6*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 119;
     static int rrseed = 14;
@@ -3130,7 +3149,8 @@ bbob2015::TwoDoubles bbob2015::f119(const decision_vector &x) const
     for (i = 0; i < m_dim; i++)
     {
         m_tmx[i] = 0.;
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
         }
     }
@@ -3157,7 +3177,7 @@ bbob2015::TwoDoubles bbob2015::f120(const decision_vector &x) const
     /* sum of different powers with uniform noise, between x^2 and x^6*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 120;
     static int rrseed = 14;
@@ -3191,7 +3211,8 @@ bbob2015::TwoDoubles bbob2015::f120(const decision_vector &x) const
     for (i = 0; i < m_dim; i++)
     {
         m_tmx[i] = 0.;
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
         }
     }
@@ -3218,7 +3239,7 @@ bbob2015::TwoDoubles bbob2015::f121(const decision_vector &x) const
     /* sum of different powers with seldom Cauchy Noise, between x^2 and x^6*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 121;
     static int rrseed = 14;
@@ -3252,7 +3273,8 @@ bbob2015::TwoDoubles bbob2015::f121(const decision_vector &x) const
     for (i = 0; i < m_dim; i++)
     {
         m_tmx[i] = 0.;
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
         }
     }
@@ -3279,7 +3301,7 @@ bbob2015::TwoDoubles bbob2015::f122(const decision_vector &x) const
     /* Schaffers F7 with Gauss noise, with asymmetric non-linear transformation, condition 10*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 122;
     static int rrseed = 17;
@@ -3356,7 +3378,7 @@ bbob2015::TwoDoubles bbob2015::f123(const decision_vector &x) const
     /* Schaffers F7 with uniform noise, with asymmetric non-linear transformation, condition 10*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 123;
     static int rrseed = 17;
@@ -3433,7 +3455,7 @@ bbob2015::TwoDoubles bbob2015::f124(const decision_vector &x) const
     /* Schaffers F7 with seldom Cauchy noise, with asymmetric non-linear transformation, condition 10*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 124;
     static int rrseed = 17;
@@ -3510,7 +3532,7 @@ bbob2015::TwoDoubles bbob2015::f125(const decision_vector &x) const
     /* F8F2 sum of Griewank-Rosenbrock 2-D blocks with Gauss noise*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 125;
     static int rrseed = 19;
@@ -3526,15 +3548,6 @@ bbob2015::TwoDoubles bbob2015::f125(const decision_vector &x) const
         /* computeXopt(rseed, m_dim);*/
         scales = fmax(1., sqrt((double)m_dim) / 8.);
         computeRotation(m_rotation, rseed, m_dim);
-/*        for (i = 0; i < m_dim; i++)
-        {
-            m_Xopt[i] = 0.;
-            for (j = 0; j < m_dim; j++)
-            {
-                m_Xopt[i] += m_rotation[j][i] * 0.5/scales;
-                //computed only if m_Xopt is returned which is not the case at this point.
-            }
-        }*/
         m_isInitDone = 1;
     }
     Fadd = m_Fopt;
@@ -3551,9 +3564,11 @@ bbob2015::TwoDoubles bbob2015::f125(const decision_vector &x) const
     Fadd += 100. * Fpen;
 
     /* TRANSFORMATION IN SEARCH SPACE*/
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmx[i] = 0.5;
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmx[i] += scales * m_rotation[i][j] * x[j];
         }
     }
@@ -3582,7 +3597,7 @@ bbob2015::TwoDoubles bbob2015::f126(const decision_vector &x) const
     /* F8F2 sum of Griewank-Rosenbrock 2-D blocks with uniform noise*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 126;
     static int rrseed = 19;
@@ -3598,15 +3613,6 @@ bbob2015::TwoDoubles bbob2015::f126(const decision_vector &x) const
         /* computeXopt(rseed, m_dim);*/
         scales = fmax(1., sqrt((double)m_dim) / 8.);
         computeRotation(m_rotation, rseed, m_dim);
-/*        for (i = 0; i < m_dim; i++)
-        {
-            m_Xopt[i] = 0.;
-            for (j = 0; j < m_dim; j++)
-            {
-                m_Xopt[i] += m_rotation[j][i] * 0.5/scales;
-                //computed only if Xopt is returned which is not the case at this point.
-            }
-        }*/
         m_isInitDone = 1;
     }
     Fadd = m_Fopt;
@@ -3623,9 +3629,11 @@ bbob2015::TwoDoubles bbob2015::f126(const decision_vector &x) const
     Fadd += 100. * Fpen;
 
     /* TRANSFORMATION IN SEARCH SPACE*/
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmx[i] = 0.5;
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmx[i] += scales * m_rotation[i][j] * x[j];
         }
     }
@@ -3654,7 +3662,7 @@ bbob2015::TwoDoubles bbob2015::f127(const decision_vector &x) const
     /* F8F2 sum of Griewank-Rosenbrock 2-D blocks with seldom Cauchy noise*/
 
     unsigned int i, j; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 127;
     static int rrseed = 19;
@@ -3687,9 +3695,11 @@ bbob2015::TwoDoubles bbob2015::f127(const decision_vector &x) const
     Fadd += 100. * Fpen;
 
     /* TRANSFORMATION IN SEARCH SPACE*/
-    for (i = 0; i < m_dim; i++) {
+    for (i = 0; i < m_dim; i++)
+    {
         m_tmx[i] = 0.5;
-        for (j = 0; j < m_dim; j++) {
+        for (j = 0; j < m_dim; j++)
+        {
             m_tmx[i] += scales * m_rotation[i][j] * x[j];
         }
     }
@@ -3718,7 +3728,7 @@ bbob2015::TwoDoubles bbob2015::f128(const decision_vector &x) const
     /* Gallagher with 101 Gaussian peaks with Gauss noise, condition up to 1000, one global m_rotation*/
 
     unsigned int i, j, k; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 128;
     static int rrseed = 21;
@@ -3741,9 +3751,9 @@ bbob2015::TwoDoubles bbob2015::f128(const decision_vector &x) const
         unif(m_peaks, NHIGHPEAKS21 - 1, rseed);
         m_rperm = m_rperm21;
         for (i = 0; i < NHIGHPEAKS21 - 1; i++)
-            m_rperm[i] = i;
+        m_rperm[i] = i;
 
-		std::sort(m_rperm.begin(), m_rperm.begin() + NHIGHPEAKS21 - 1, compare_doubles(*this));
+        std::sort(m_rperm.begin(), m_rperm.begin() + NHIGHPEAKS21 - 1, compare_doubles(*this));
 
         /* Random permutation*/
 
@@ -3759,11 +3769,11 @@ bbob2015::TwoDoubles bbob2015::f128(const decision_vector &x) const
         {
             unif(m_peaks, m_dim, rseed + 1000 * i);
             for (j = 0; j < m_dim; j++)
-                m_rperm[j] = j;
+            m_rperm[j] = j;
 
-			std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
+            std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
 
-			for (j = 0; j < m_dim; j++)
+            for (j = 0; j < m_dim; j++)
             {
                 m_arrScales[i][j] = pow(arrCondition[i], ((double)m_rperm[j])/((double)(m_dim-1)) - 0.5);
             }
@@ -3855,7 +3865,7 @@ bbob2015::TwoDoubles bbob2015::f129(const decision_vector &x) const
     /* Gallagher with 101 Gaussian peaks with uniform noise, condition up to 1000, one global m_rotation*/
 
     unsigned int i, j, k; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 129;
     static int rrseed = 21;
@@ -3878,9 +3888,9 @@ bbob2015::TwoDoubles bbob2015::f129(const decision_vector &x) const
         unif(m_peaks, NHIGHPEAKS21 - 1, rseed);
         m_rperm = m_rperm21;
         for (i = 0; i < NHIGHPEAKS21 - 1; i++)
-            m_rperm[i] = i;
+        m_rperm[i] = i;
 
-		std::sort(m_rperm.begin(), m_rperm.begin() + NHIGHPEAKS21 - 1, compare_doubles(*this));
+        std::sort(m_rperm.begin(), m_rperm.begin() + NHIGHPEAKS21 - 1, compare_doubles(*this));
 
         /* Random permutation*/
 
@@ -3896,9 +3906,9 @@ bbob2015::TwoDoubles bbob2015::f129(const decision_vector &x) const
         {
             unif(m_peaks, m_dim, rseed + 1000 * i);
             for (j = 0; j < m_dim; j++)
-                m_rperm[j] = j;
+            m_rperm[j] = j;
 
-			std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
+            std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
 
             for (j = 0; j < m_dim; j++)
             {
@@ -3922,7 +3932,7 @@ bbob2015::TwoDoubles bbob2015::f129(const decision_vector &x) const
                     m_Xlocal[i][j] *= 0.8;
             }
         }
-        m_isInitDone = 1;
+    m_isInitDone = 1;
     }
     Fadd = m_Fopt;
 
@@ -3992,7 +4002,7 @@ bbob2015::TwoDoubles bbob2015::f130(const decision_vector &x) const
     /* Gallagher with 101 Gaussian peaks with Cauchy noise, condition up to 1000, one global m_rotation*/
 
     unsigned int i, j, k; /*Loop over dim*/
-	int rseed;
+    int rseed;
 
     static int funcId = 130;
     static int rrseed = 21;
@@ -4015,9 +4025,9 @@ bbob2015::TwoDoubles bbob2015::f130(const decision_vector &x) const
         unif(m_peaks, NHIGHPEAKS21 - 1, rseed);
         m_rperm = m_rperm21;
         for (i = 0; i < NHIGHPEAKS21 - 1; i++)
-            m_rperm[i] = i;
+        m_rperm[i] = i;
 
-		std::sort(m_rperm.begin(), m_rperm.begin() + NHIGHPEAKS21 - 1, compare_doubles(*this));
+        std::sort(m_rperm.begin(), m_rperm.begin() + NHIGHPEAKS21 - 1, compare_doubles(*this));
 
         /* Random permutation*/
 
@@ -4033,9 +4043,9 @@ bbob2015::TwoDoubles bbob2015::f130(const decision_vector &x) const
         {
             unif(m_peaks, m_dim, rseed + 1000 * i);
             for (j = 0; j < m_dim; j++)
-                m_rperm[j] = j;
+            m_rperm[j] = j;
 
-			std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
+            std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
 
             for (j = 0; j < m_dim; j++)
             {
