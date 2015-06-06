@@ -138,7 +138,7 @@ class __PAGMO_VISIBLE bbob2015 : public base_stochastic
 		/*initialize and finalize Benchmarks*/
 		void initbenchmarks(void) const;
 
-		/*benchmark functions*/
+		/*Non-noisy benchmark functions*/
 		TwoDoubles f1(const decision_vector &x) const;
 		TwoDoubles f2(const decision_vector &x) const;
 		TwoDoubles f3(const decision_vector &x) const;
@@ -163,13 +163,52 @@ class __PAGMO_VISIBLE bbob2015 : public base_stochastic
 		TwoDoubles f22(const decision_vector &x) const;
 		TwoDoubles f23(const decision_vector &x) const;
 		TwoDoubles f24(const decision_vector &x) const;
-		
+
+		/*Noisy benchmark functions*/
+		TwoDoubles f101(const decision_vector &x) const;
+		TwoDoubles f102(const decision_vector &x) const;
+		TwoDoubles f103(const decision_vector &x) const;
+		TwoDoubles f104(const decision_vector &x) const;
+		TwoDoubles f105(const decision_vector &x) const;
+		TwoDoubles f106(const decision_vector &x) const;
+		TwoDoubles f107(const decision_vector &x) const;
+		TwoDoubles f108(const decision_vector &x) const;
+		TwoDoubles f109(const decision_vector &x) const;
+		TwoDoubles f110(const decision_vector &x) const;
+		TwoDoubles f111(const decision_vector &x) const;
+		TwoDoubles f112(const decision_vector &x) const;
+		TwoDoubles f113(const decision_vector &x) const;
+		TwoDoubles f114(const decision_vector &x) const;
+		TwoDoubles f115(const decision_vector &x) const;
+		TwoDoubles f116(const decision_vector &x) const;
+		TwoDoubles f117(const decision_vector &x) const;
+		TwoDoubles f118(const decision_vector &x) const;
+		TwoDoubles f119(const decision_vector &x) const;
+		TwoDoubles f120(const decision_vector &x) const;
+		TwoDoubles f121(const decision_vector &x) const;
+		TwoDoubles f122(const decision_vector &x) const;
+		TwoDoubles f123(const decision_vector &x) const;
+		TwoDoubles f124(const decision_vector &x) const;
+		TwoDoubles f125(const decision_vector &x) const;
+		TwoDoubles f126(const decision_vector &x) const;
+		TwoDoubles f127(const decision_vector &x) const;
+		TwoDoubles f128(const decision_vector &x) const;
+		TwoDoubles f129(const decision_vector &x) const;
+		TwoDoubles f130(const decision_vector &x) const;
+
 		/* array of function pointers*/
-		bbobFunction handles[24] = { &bbob2015::f1, &bbob2015::f2, &bbob2015::f3, &bbob2015::f4, &bbob2015::f5, &bbob2015::f6, &bbob2015::f7, &bbob2015::f8, &bbob2015::f9, &bbob2015::f10, &bbob2015::f11, &bbob2015::f12, &bbob2015::f13, &bbob2015::f14, &bbob2015::f15, &bbob2015::f16, &bbob2015::f17, &bbob2015::f18, &bbob2015::f19, &bbob2015::f20, &bbob2015::f21, &bbob2015::f22, &bbob2015::f23, &bbob2015::f24};
+		bbobFunction handles[24] = { &bbob2015::f1, &bbob2015::f2, &bbob2015::f3, &bbob2015::f4, &bbob2015::f5, &bbob2015::f6, 
+			&bbob2015::f7, &bbob2015::f8, &bbob2015::f9, &bbob2015::f10, &bbob2015::f11, &bbob2015::f12, &bbob2015::f13, 
+			&bbob2015::f14, &bbob2015::f15, &bbob2015::f16, &bbob2015::f17, &bbob2015::f18, &bbob2015::f19, &bbob2015::f20,
+			 &bbob2015::f21, &bbob2015::f22, &bbob2015::f23, &bbob2015::f24};
 		unsigned int handlesLength = 24;
 
-		//bbobFunction handlesNoisy[30] = { &bbob2015::f101, &bbob2015::f102, &bbob2015::f103, &bbob2015::f104, &bbob2015::f105, &bbob2015::f106, &bbob2015::f107, &bbob2015::f108, &bbob2015::f109, &bbob2015::f110, &bbob2015::f111, &bbob2015::f112, &bbob2015::f113, &bbob2015::f114, &bbob2015::f115, &bbob2015::f116, &bbob2015::f117, &bbob2015::f118, &bbob2015::f119, &bbob2015::f120, &bbob2015::f121, &bbob2015::f122, &bbob2015::f123, &bbob2015::f124, &bbob2015::f125, &bbob2015::f126, &bbob2015::f127, &bbob2015::f128, &bbob2015::f129, &bbob2015::f130};
-		// unsigned int handlesNoisyLength = 30;
+		bbobFunction handlesNoisy[30] = { &bbob2015::f101, &bbob2015::f102, &bbob2015::f103, &bbob2015::f104, &bbob2015::f105, 
+			&bbob2015::f106, &bbob2015::f107, &bbob2015::f108, &bbob2015::f109, &bbob2015::f110, &bbob2015::f111, &bbob2015::f112, 
+			&bbob2015::f113, &bbob2015::f114, &bbob2015::f115, &bbob2015::f116, &bbob2015::f117, &bbob2015::f118, &bbob2015::f119, 
+			&bbob2015::f120, &bbob2015::f121, &bbob2015::f122, &bbob2015::f123, &bbob2015::f124, &bbob2015::f125, &bbob2015::f126, 
+			&bbob2015::f127, &bbob2015::f128, &bbob2015::f129, &bbob2015::f130};
+		unsigned int handlesNoisyLength = 30;
 
 };
 }}

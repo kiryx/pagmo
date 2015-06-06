@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #include <string>
-#include <time.h>
 #include "../serialization.h"
 #include "../types.h"
 #include "base.h"
@@ -48,8 +47,8 @@ bbob2015::bbob2015(unsigned int problem_number, problem::base::size_type dim):ba
 
 	if (problem_number < handlesLength )
 		m_actFunc = handles[problem_number-1];
-	// else if( (100 < problem_number) && (problem_number-101 < handlesNoisyLength) )
-	// 	m_actFunc = handlesNoisy[problem_number - 101];
+	else if( (100 < problem_number) && (problem_number-101 < handlesNoisyLength) )
+		m_actFunc = handlesNoisy[problem_number - 101];
 	else
 		pagmo_throw(value_error, "problem_number specified is not a valid function of BBOB testbed");
 
@@ -2011,6 +2010,2120 @@ bbob2015::TwoDoubles bbob2015::f24(const decision_vector &x) const
     res.Ftrue = Ftrue;
     return res;
 }
+
+/*
+ * Noisy functions testbed. All functions are ranged in [-5, 5]^m_dim.
+ */
+
+bbob2015::TwoDoubles bbob2015::f101(const decision_vector &x) const
+{
+    /*sphere with moderate Gauss noise*/
+
+    unsigned int i; /*Loop over dim*/
+	int rseed;
+
+    static unsigned int funcId = 101;
+    static unsigned int rrseed = 1;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = (x[i] - m_Xopt[i]);
+        Ftrue += tmp * tmp;
+    }
+
+    Fval = FGauss(Ftrue, 0.01);
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f102(const decision_vector &x) const
+{
+    /* sphere with moderate uniform noise*/
+
+    unsigned int i; /*Loop over dim*/
+	int rseed;
+
+    static unsigned int funcId = 102;
+    static unsigned int rrseed = 1;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = (x[i] - m_Xopt[i]);
+        Ftrue += tmp * tmp;
+    }
+    Fval = FUniform(Ftrue, 0.01 * (0.49 + 1./m_dim), 0.01);
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f103(const decision_vector &x) const
+{
+    /* sphere with moderate Cauchy noise*/
+
+    unsigned int i; /*Loop over dim*/
+	int rseed;
+
+    static unsigned int funcId = 103;
+    static unsigned int rrseed = 1;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = (x[i] - m_Xopt[i]);
+        Ftrue += tmp * tmp;
+    }
+    Fval = FCauchy(Ftrue, 0.01, 0.05);
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f104(const decision_vector &x) const
+{
+    /* Rosenbrock non-rotated with moderate Gauss noise*/
+
+    unsigned int i; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 104;
+    static int rrseed = 8;
+    static double scales;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        scales = fmax(1., sqrt((double)m_dim) / 8.);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++) {
+        m_tmx[i] = scales * (x[i] - 0.75 * m_Xopt[i]) + 1;
+    }
+
+    /* COMPUTATION core*/
+    Ftrue = 0.;
+    for (i = 0; i < m_dim - 1; i++)
+    {
+        tmp = (m_tmx[i] * m_tmx[i] - m_tmx[i+1]);
+        Ftrue += tmp * tmp;
+    }
+    Ftrue *= 1e2;
+    for (i = 0; i < m_dim - 1; i ++)
+    {
+        tmp = (m_tmx[i] - 1);
+        Ftrue += tmp * tmp;
+    }
+
+    Fval = FGauss(Ftrue, 0.01);
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f105(const decision_vector &x) const
+{
+    /* Rosenbrock non-rotated with moderate uniform noise*/
+
+    unsigned int i; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 105;
+    static int rrseed = 8;
+    static double scales;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        scales = fmax(1., sqrt((double)m_dim) / 8.);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++) {
+        m_tmx[i] = scales * (x[i] - 0.75 * m_Xopt[i]) + 1;
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim - 1; i++)
+    {
+        tmp = (m_tmx[i] * m_tmx[i] - m_tmx[i+1]);
+        Ftrue += tmp * tmp;
+    }
+    Ftrue *= 1e2;
+    for (i = 0; i < m_dim - 1; i ++)
+    {
+        tmp = (m_tmx[i] - 1);
+        Ftrue += tmp * tmp;
+    }
+
+    Fval = FUniform(Ftrue, 0.01 * (0.49 + 1./m_dim), 0.01);
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f106(const decision_vector &x) const
+{
+    /* Rosenbrock non-rotated with moderate Cauchy noise*/
+
+    unsigned int i; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 106;
+    static int rrseed = 8;
+    static double scales;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        scales = fmax(1., sqrt((double)m_dim) / 8.);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++) {
+        m_tmx[i] = scales * (x[i] - 0.75 * m_Xopt[i]) + 1;
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim - 1; i++)
+    {
+        tmp = (m_tmx[i] * m_tmx[i] - m_tmx[i+1]);
+        Ftrue += tmp * tmp;
+    }
+    Ftrue *= 1e2;
+    for (i = 0; i < m_dim - 1; i ++)
+    {
+        tmp = (m_tmx[i] - 1);
+        Ftrue += tmp * tmp;
+    }
+
+    Fval = FCauchy(Ftrue, 0.01, 0.05);
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f107(const decision_vector &x) const
+{
+    /*sphere with Gauss noise*/
+
+    unsigned int i; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 107;
+    static int rrseed = 1;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = (x[i] - m_Xopt[i]);
+        Ftrue += tmp * tmp;
+    }
+    Fval = FGauss(Ftrue, 1.);
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f108(const decision_vector &x) const
+{
+    /*sphere with uniform noise*/
+
+    unsigned int i; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 108;
+    static int rrseed = 1;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = (x[i] - m_Xopt[i]);
+        Ftrue += tmp * tmp;
+    }
+    Fval = FUniform(Ftrue, 0.49 + 1./m_dim, 1.);
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f109(const decision_vector &x) const
+{
+    /*sphere with Cauchy noise*/
+
+    unsigned int i; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 109;
+    static int rrseed = 1;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = (x[i] - m_Xopt[i]);
+        Ftrue += tmp * tmp;
+    }
+    Fval = FCauchy(Ftrue, 1., 0.2);
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f110(const decision_vector &x) const
+{
+    /* Rosenbrock non-rotated with Gauss noise*/
+
+    unsigned int i; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 110;
+    static int rrseed = 8;
+    static double scales;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        scales = fmax(1., sqrt((double)m_dim) / 8.);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++) {
+        m_tmx[i] = scales * (x[i] - 0.75 * m_Xopt[i]) + 1;
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim - 1; i++)
+    {
+        tmp = (m_tmx[i] * m_tmx[i] - m_tmx[i+1]);
+        Ftrue += tmp * tmp;
+    }
+    Ftrue *= 1e2;
+    for (i = 0; i < m_dim - 1; i ++)
+    {
+        tmp = (m_tmx[i] - 1);
+        Ftrue += tmp * tmp;
+    }
+    Fval = FGauss(Ftrue, 1.);
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f111(const decision_vector &x) const
+{
+    /* Rosenbrock non-rotated with moderate uniform noise*/
+
+    unsigned int i; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 111;
+    static int rrseed = 8;
+    static double scales;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        scales = fmax(1., sqrt((double)m_dim) / 8.);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++) {
+        m_tmx[i] = scales * (x[i] - 0.75 * m_Xopt[i]) + 1;
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim - 1; i++)
+    {
+        tmp = (m_tmx[i] * m_tmx[i] - m_tmx[i+1]);
+        Ftrue += tmp * tmp;
+    }
+    Ftrue *= 1e2;
+    for (i = 0; i < m_dim - 1; i ++)
+    {
+        tmp = (m_tmx[i] - 1);
+        Ftrue += tmp * tmp;
+    }
+    Fval = FUniform(Ftrue, 0.49 + 1./m_dim, 1.);
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f112(const decision_vector &x) const
+{
+    /* Rosenbrock non-rotated with moderate Cauchy noise*/
+
+    unsigned int i; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 112;
+    static int rrseed = 8;
+    static double scales;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        scales = fmax(1., sqrt((double)m_dim) / 8.);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++) {
+        m_tmx[i] = scales * (x[i] - 0.75 * m_Xopt[i]) + 1;
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim - 1; i++)
+    {
+        tmp = (m_tmx[i] * m_tmx[i] - m_tmx[i+1]);
+        Ftrue += tmp * tmp;
+    }
+    Ftrue *= 1e2;
+    for (i = 0; i < m_dim - 1; i ++)
+    {
+        tmp = (m_tmx[i] - 1);
+        Ftrue += tmp * tmp;
+    }
+    Fval = FCauchy(Ftrue, 1., 0.2);
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f113(const decision_vector &x) const
+{
+    /* step-ellipsoid with gauss noise, condition 100*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 113;
+    static int rrseed = 7;
+    static double condition = 100.;
+    static double alpha = 10.;
+    double x1, Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        computeRotation(m_rotation, rseed + 1000000, m_dim);
+        computeRotation(m_rot2, rseed, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++) {
+        m_tmpvect[i] = 0.;
+        tmp = sqrt(pow(condition/10., ((double)i)/((double)(m_dim-1))));
+        for (j = 0; j < m_dim; j++) {
+            m_tmpvect[i] += tmp * m_rot2[i][j] * (x[j] - m_Xopt[j]);
+        }
+    }
+    x1 = m_tmpvect[0];
+    for (i = 0; i < m_dim; i++) {
+        if (fabs(m_tmpvect[i]) > 0.5)
+        {
+            m_tmpvect[i] = round(m_tmpvect[i]);
+        }
+        else
+        {
+            m_tmpvect[i] = round(alpha * m_tmpvect[i])/alpha;
+        }
+    }
+
+    for (i = 0; i < m_dim; i++) {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++) {
+            m_tmx[i] += m_rotation[i][j] * m_tmpvect[j];
+        }
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        Ftrue += pow(condition, ((double)i)/((double)(m_dim-1))) * m_tmx[i] * m_tmx[i];
+    }
+    Ftrue = 0.1 * fmax(1e-4 * fabs(x1), Ftrue);
+    Fval = FGauss(Ftrue, 1.);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f114(const decision_vector &x) const
+{
+    /* step-ellipsoid with uniform noise, condition 100*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 114;
+    static int rrseed = 7;
+    static double condition = 100.;
+    static double alpha = 10.;
+    double x1, Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        computeRotation(m_rotation, rseed + 1000000, m_dim);
+        computeRotation(m_rot2, rseed, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++) {
+        m_tmpvect[i] = 0.;
+        tmp = sqrt(pow(condition/10., ((double)i)/((double)(m_dim-1))));
+        for (j = 0; j < m_dim; j++) {
+            m_tmpvect[i] += tmp * m_rot2[i][j] * (x[j] - m_Xopt[j]);
+        }
+    }
+    x1 = m_tmpvect[0];
+    for (i = 0; i < m_dim; i++) {
+        if (fabs(m_tmpvect[i]) > 0.5)
+        {
+            m_tmpvect[i] = round(m_tmpvect[i]);
+        }
+        else
+        {
+            m_tmpvect[i] = round(alpha * m_tmpvect[i])/alpha;
+        }
+    }
+
+    for (i = 0; i < m_dim; i++) {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++) {
+            m_tmx[i] += m_rotation[i][j] * m_tmpvect[j];
+        }
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        Ftrue += pow(condition, ((double)i)/((double)(m_dim-1))) * m_tmx[i] * m_tmx[i];
+    }
+    Ftrue = 0.1 * fmax(1e-4 * fabs(x1), Ftrue);
+    Fval = FUniform(Ftrue, 0.49 + 1./m_dim, 1.);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f115(const decision_vector &x) const
+{
+    /* step-ellipsoid with Cauchy noise, condition 100*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 115;
+    static int rrseed = 7;
+    static double condition = 100.;
+    static double alpha = 10.;
+    double x1, Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        computeRotation(m_rotation, rseed + 1000000, m_dim);
+        computeRotation(m_rot2, rseed, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++) {
+        m_tmpvect[i] = 0.;
+        tmp = sqrt(pow(condition/10., ((double)i)/((double)(m_dim-1))));
+        for (j = 0; j < m_dim; j++) {
+            m_tmpvect[i] += tmp * m_rot2[i][j] * (x[j] - m_Xopt[j]);
+        }
+    }
+    x1 = m_tmpvect[0];
+    for (i = 0; i < m_dim; i++) {
+        if (fabs(m_tmpvect[i]) > 0.5)
+        {
+            m_tmpvect[i] = round(m_tmpvect[i]);
+        }
+        else
+        {
+            m_tmpvect[i] = round(alpha * m_tmpvect[i])/alpha;
+        }
+    }
+
+    for (i = 0; i < m_dim; i++) {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++) {
+            m_tmx[i] += m_rotation[i][j] * m_tmpvect[j];
+        }
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        Ftrue += pow(condition, ((double)i)/((double)(m_dim-1))) * m_tmx[i] * m_tmx[i];
+    }
+    Ftrue = 0.1 * fmax(1e-4 * fabs(x1), Ftrue);
+    Fval = FCauchy(Ftrue, 1., 0.2);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f116(const decision_vector &x) const
+{
+    /* ellipsoid with Gauss noise, monotone x-transformation, condition 1e4*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 116;
+    static int rrseed = 10;
+    static double condition = 1e4;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        computeRotation(m_rotation, rseed + 1000000, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++) {
+            m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
+        }
+    }
+
+    monotoneTFosc(m_tmx);
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        Ftrue += pow(condition, ((double)i)/((double)(m_dim-1))) * m_tmx[i] * m_tmx[i];
+    }
+
+    Fval = FGauss(Ftrue, 1.);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f117(const decision_vector &x) const
+{
+    /* ellipsoid with uniform noise, monotone x-transformation, condition 1e4*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 117;
+    static int rrseed = 10;
+    static double condition = 1e4;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        computeRotation(m_rotation, rseed + 1000000, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++) {
+            m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
+        }
+    }
+
+    monotoneTFosc(m_tmx);
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        Ftrue += pow(condition, ((double)i)/((double)(m_dim-1))) * m_tmx[i] * m_tmx[i];
+    }
+
+    Fval = FUniform(Ftrue, 0.49 + 1./m_dim, 1.);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f118(const decision_vector &x) const
+{
+    /* ellipsoid with Cauchy noise, monotone x-transformation, condition 1e4*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 118;
+    static int rrseed = 10;
+    static double condition = 1e4;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        computeRotation(m_rotation, rseed + 1000000, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++) {
+            m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
+        }
+    }
+
+    monotoneTFosc(m_tmx);
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        Ftrue += pow(condition, ((double)i)/((double)(m_dim-1))) * m_tmx[i] * m_tmx[i];
+    }
+
+    Fval = FCauchy(Ftrue, 1., 0.2);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f119(const decision_vector &x) const
+{
+    /* sum of different powers with Gauss Noise, between x^2 and x^6*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 119;
+    static int rrseed = 14;
+    static double alpha = 4.;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        computeRotation(m_rotation, rseed + 1000000, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++) {
+            m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
+        }
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        Ftrue += pow(fabs(m_tmx[i]), 2 + alpha * ((double)i)/((double)(m_dim-1)));
+    }
+    Ftrue = sqrt(Ftrue);
+
+    Fval = FGauss(Ftrue, 1.);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f120(const decision_vector &x) const
+{
+    /* sum of different powers with uniform noise, between x^2 and x^6*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 120;
+    static int rrseed = 14;
+    static double alpha = 4.;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        computeRotation(m_rotation, rseed + 1000000, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++) {
+            m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
+        }
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        Ftrue += pow(fabs(m_tmx[i]), 2 + alpha * ((double)i)/((double)(m_dim-1)));
+    }
+    Ftrue = sqrt(Ftrue);
+
+    Fval = FUniform(Ftrue, 0.49 + 1./m_dim, 1.);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f121(const decision_vector &x) const
+{
+    /* sum of different powers with seldom Cauchy Noise, between x^2 and x^6*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 121;
+    static int rrseed = 14;
+    static double alpha = 4.;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        computeRotation(m_rotation, rseed + 1000000, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++) {
+            m_tmx[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
+        }
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim; i++)
+    {
+        Ftrue += pow(fabs(m_tmx[i]), 2 + alpha * ((double)i)/((double)(m_dim-1)));
+    }
+    Ftrue = sqrt(Ftrue);
+
+    Fval = FCauchy(Ftrue, 1., 0.2);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f122(const decision_vector &x) const
+{
+    /* Schaffers F7 with Gauss noise, with asymmetric non-linear transformation, condition 10*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 122;
+    static int rrseed = 17;
+    static double condition = 10.;
+    static double beta = 0.5;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        computeRotation(m_rotation, rseed + 1000000, m_dim);
+        computeRotation(m_rot2, rseed, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmpvect[i] = 0.;
+        for (j = 0; j < m_dim; j++)
+        {
+            m_tmpvect[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
+        }
+        if (m_tmpvect[i] > 0)
+            m_tmpvect[i] = pow(m_tmpvect[i], 1 + beta * ((double)i)/((double)(m_dim-1)) * sqrt(m_tmpvect[i]));
+    }
+
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmx[i] = 0.;
+        tmp = pow(sqrt(condition), ((double)i)/((double)(m_dim-1)));
+        for (j = 0; j < m_dim; j++)
+        {
+            m_tmx[i] += tmp * m_rot2[i][j] * m_tmpvect[j];
+        }
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim - 1; i++)
+    {
+        tmp = m_tmx[i] * m_tmx[i] + m_tmx[i+1] * m_tmx[i+1];
+        Ftrue += pow(tmp, 0.25) * (pow(sin(50. * pow(tmp, 0.1)), 2.) + 1.);
+    }
+    Ftrue = pow(Ftrue/(double)(m_dim - 1), 2.);
+
+    Fval = FGauss(Ftrue, 1.);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f123(const decision_vector &x) const
+{
+    /* Schaffers F7 with uniform noise, with asymmetric non-linear transformation, condition 10*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 123;
+    static int rrseed = 17;
+    static double condition = 10.;
+    static double beta = 0.5;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        computeRotation(m_rotation, rseed + 1000000, m_dim);
+        computeRotation(m_rot2, rseed, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmpvect[i] = 0.;
+        for (j = 0; j < m_dim; j++)
+        {
+            m_tmpvect[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
+        }
+        if (m_tmpvect[i] > 0)
+            m_tmpvect[i] = pow(m_tmpvect[i], 1 + beta * ((double)i)/((double)(m_dim-1)) * sqrt(m_tmpvect[i]));
+    }
+
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmx[i] = 0.;
+        tmp = pow(sqrt(condition), ((double)i)/((double)(m_dim-1)));
+        for (j = 0; j < m_dim; j++)
+        {
+            m_tmx[i] += tmp * m_rot2[i][j] * m_tmpvect[j];
+        }
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim - 1; i++)
+    {
+        tmp = m_tmx[i] * m_tmx[i] + m_tmx[i+1] * m_tmx[i+1];
+        Ftrue += pow(tmp, 0.25) * (pow(sin(50. * pow(tmp, 0.1)), 2.) + 1.);
+    }
+    Ftrue = pow(Ftrue/(double)(m_dim - 1), 2.);
+
+    Fval = FUniform(Ftrue, 0.49 + 1./m_dim, 1.);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f124(const decision_vector &x) const
+{
+    /* Schaffers F7 with seldom Cauchy noise, with asymmetric non-linear transformation, condition 10*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 124;
+    static int rrseed = 17;
+    static double condition = 10.;
+    static double beta = 0.5;
+    double Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeXopt(rseed, m_dim);
+        computeRotation(m_rotation, rseed + 1000000, m_dim);
+        computeRotation(m_rot2, rseed, m_dim);
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmpvect[i] = 0.;
+        for (j = 0; j < m_dim; j++)
+        {
+            m_tmpvect[i] += m_rotation[i][j] * (x[j] - m_Xopt[j]);
+        }
+        if (m_tmpvect[i] > 0)
+            m_tmpvect[i] = pow(m_tmpvect[i], 1 + beta * ((double)i)/((double)(m_dim-1)) * sqrt(m_tmpvect[i]));
+    }
+
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmx[i] = 0.;
+        tmp = pow(sqrt(condition), ((double)i)/((double)(m_dim-1)));
+        for (j = 0; j < m_dim; j++)
+        {
+            m_tmx[i] += tmp * m_rot2[i][j] * m_tmpvect[j];
+        }
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < m_dim - 1; i++)
+    {
+        tmp = m_tmx[i] * m_tmx[i] + m_tmx[i+1] * m_tmx[i+1];
+        Ftrue += pow(tmp, 0.25) * (pow(sin(50. * pow(tmp, 0.1)), 2.) + 1.);
+    }
+    Ftrue = pow(Ftrue/(double)(m_dim - 1), 2.);
+
+    Fval = FCauchy(Ftrue, 1., 0.2);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f125(const decision_vector &x) const
+{
+    /* F8F2 sum of Griewank-Rosenbrock 2-D blocks with Gauss noise*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 125;
+    static int rrseed = 19;
+    static double scales;
+    double F2, Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        /* computeXopt(rseed, m_dim);*/
+        scales = fmax(1., sqrt((double)m_dim) / 8.);
+        computeRotation(m_rotation, rseed, m_dim);
+/*        for (i = 0; i < m_dim; i++)
+        {
+            m_Xopt[i] = 0.;
+            for (j = 0; j < m_dim; j++)
+            {
+                m_Xopt[i] += m_rotation[j][i] * 0.5/scales;
+                //computed only if m_Xopt is returned which is not the case at this point.
+            }
+        }*/
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++) {
+        m_tmx[i] = 0.5;
+        for (j = 0; j < m_dim; j++) {
+            m_tmx[i] += scales * m_rotation[i][j] * x[j];
+        }
+    }
+
+    /* COMPUTATION core*/
+    tmp = 0.;
+    for (i = 0; i < m_dim - 1; i++)
+    {
+        F2 = 100. * (m_tmx[i] * m_tmx[i] - m_tmx[i+1]) * (m_tmx[i] * m_tmx[i] - m_tmx[i+1]) + (1 - m_tmx[i]) * (1 - m_tmx[i]);
+        tmp += F2 / 4000. - cos(F2);
+    }
+    Ftrue = 1. + 1. * tmp / (double)(m_dim - 1);
+
+    Fval = FGauss(Ftrue, 1.);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f126(const decision_vector &x) const
+{
+    /* F8F2 sum of Griewank-Rosenbrock 2-D blocks with uniform noise*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 126;
+    static int rrseed = 19;
+    static double scales;
+    double F2, Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        /* computeXopt(rseed, m_dim);*/
+        scales = fmax(1., sqrt((double)m_dim) / 8.);
+        computeRotation(m_rotation, rseed, m_dim);
+/*        for (i = 0; i < m_dim; i++)
+        {
+            m_Xopt[i] = 0.;
+            for (j = 0; j < m_dim; j++)
+            {
+                m_Xopt[i] += m_rotation[j][i] * 0.5/scales;
+                //computed only if Xopt is returned which is not the case at this point.
+            }
+        }*/
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++) {
+        m_tmx[i] = 0.5;
+        for (j = 0; j < m_dim; j++) {
+            m_tmx[i] += scales * m_rotation[i][j] * x[j];
+        }
+    }
+
+    /* COMPUTATION core*/
+    tmp = 0.;
+    for (i = 0; i < m_dim - 1; i++)
+    {
+        F2 = 100. * (m_tmx[i] * m_tmx[i] - m_tmx[i+1]) * (m_tmx[i] * m_tmx[i] - m_tmx[i+1]) + (1 - m_tmx[i]) * (1 - m_tmx[i]);
+        tmp += F2 / 4000. - cos(F2);
+    }
+    Ftrue = 1. + 1. * tmp / (double)(m_dim - 1);
+
+    Fval = FUniform(Ftrue, 0.49 + 1./m_dim, 1.);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f127(const decision_vector &x) const
+{
+    /* F8F2 sum of Griewank-Rosenbrock 2-D blocks with seldom Cauchy noise*/
+
+    unsigned int i, j; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 127;
+    static int rrseed = 19;
+    static double scales;
+    double F2, Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        /* computem_Xopt(rseed, m_dim);*/
+        scales = fmax(1., sqrt((double)m_dim) / 8.);
+        computeRotation(m_rotation, rseed, m_dim);
+
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++) {
+        m_tmx[i] = 0.5;
+        for (j = 0; j < m_dim; j++) {
+            m_tmx[i] += scales * m_rotation[i][j] * x[j];
+        }
+    }
+
+    /* COMPUTATION core*/
+    tmp = 0.;
+    for (i = 0; i < m_dim - 1; i++)
+    {
+        F2 = 100. * (m_tmx[i] * m_tmx[i] - m_tmx[i+1]) * (m_tmx[i] * m_tmx[i] - m_tmx[i+1]) + (1 - m_tmx[i]) * (1 - m_tmx[i]);
+        tmp += F2 / 4000. - cos(F2);
+    }
+    Ftrue = 1. + 1. * tmp / (double)(m_dim - 1);
+
+    Fval = FCauchy(Ftrue, 1., 0.2);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f128(const decision_vector &x) const
+{
+    /* Gallagher with 101 Gaussian peaks with Gauss noise, condition up to 1000, one global m_rotation*/
+
+    unsigned int i, j, k; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 128;
+    static int rrseed = 21;
+    static double fitvalues[2] = {1.1, 9.1};
+    static double maxcondition = 1000.;
+    static double arrCondition[NHIGHPEAKS21];
+    static double peakvalues[NHIGHPEAKS21];
+    static double a = 0.1;
+    double tmp2, f = 0., Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    double fac = -0.5 / (double)m_dim;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeRotation(m_rotation, rseed, m_dim);
+        m_peaks = m_peaks21;
+        unif(m_peaks, NHIGHPEAKS21 - 1, rseed);
+        m_rperm = m_rperm21;
+        for (i = 0; i < NHIGHPEAKS21 - 1; i++)
+            m_rperm[i] = i;
+
+		std::sort(m_rperm.begin(), m_rperm.begin() + NHIGHPEAKS21 - 1, compare_doubles(*this));
+
+        /* Random permutation*/
+
+        arrCondition[0] = sqrt(maxcondition);
+        peakvalues[0] = 10;
+        for (i = 1; i < NHIGHPEAKS21; i++)
+        {
+            arrCondition[i] = pow(maxcondition, (double)(m_rperm[i-1])/((double)(NHIGHPEAKS21-2)));
+            peakvalues[i] = (double)(i-1)/(double)(NHIGHPEAKS21-2) * (fitvalues[1] - fitvalues[0]) + fitvalues[0];
+        }
+        m_arrScales = m_arrScales21;
+        for (i = 0; i < NHIGHPEAKS21; i++)
+        {
+            unif(m_peaks, m_dim, rseed + 1000 * i);
+            for (j = 0; j < m_dim; j++)
+                m_rperm[j] = j;
+
+			std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
+
+			for (j = 0; j < m_dim; j++)
+            {
+                m_arrScales[i][j] = pow(arrCondition[i], ((double)m_rperm[j])/((double)(m_dim-1)) - 0.5);
+            }
+        }
+
+        unif(m_peaks, m_dim * NHIGHPEAKS21, rseed);
+        m_Xlocal = m_Xlocal21;
+        for (i = 0; i < m_dim; i++)
+        {
+            m_Xopt[i] = 0.8 * (10. * m_peaks[i] -5.);
+            for (j = 0; j < NHIGHPEAKS21; j++)
+            {
+                m_Xlocal[i][j] = 0.;
+                for (k = 0; k < m_dim; k++)
+                {
+                    m_Xlocal[i][j] += m_rotation[i][k] * (10. * m_peaks[j * m_dim + k] -5.);
+                }
+                if (j == 0)
+                    m_Xlocal[i][j] *= 0.8;
+            }
+        }
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++)
+        {
+            m_tmx[i] += m_rotation[i][j] * x[j];
+        }
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < NHIGHPEAKS21; i++)
+    {
+        tmp2 = 0.;
+        for (j = 0; j < m_dim; j++)
+        {
+            tmp2 += m_arrScales[i][j] * (m_tmx[j] - m_Xlocal[j][i]) * (m_tmx[j] - m_Xlocal[j][i]);
+        }
+        tmp2 = peakvalues[i] * exp(fac * tmp2);
+        f = fmax(f, tmp2);
+    }
+
+    f = 10 - f;
+    /*monotoneTFosc*/
+    if (f > 0)
+    {
+        Ftrue = log(f)/a;
+        Ftrue = pow(exp(Ftrue + 0.49*(sin(Ftrue) + sin(0.79*Ftrue))), a);
+    }
+    else if (f < 0)
+    {
+        Ftrue = log(-f)/a;
+        Ftrue = -pow(exp(Ftrue + 0.49*(sin(0.55 * Ftrue) + sin(0.31*Ftrue))), a);
+    }
+    else
+        Ftrue = f;
+
+    Ftrue *= Ftrue;
+
+    Fval = FGauss(Ftrue, 1.);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+    /* free(m_Xopt); //Not used!*/
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f129(const decision_vector &x) const
+{
+    /* Gallagher with 101 Gaussian peaks with uniform noise, condition up to 1000, one global m_rotation*/
+
+    unsigned int i, j, k; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 129;
+    static int rrseed = 21;
+    static double fitvalues[2] = {1.1, 9.1};
+    static double maxcondition = 1000.;
+    static double arrCondition[NHIGHPEAKS21];
+    static double peakvalues[NHIGHPEAKS21];
+    static double a = 0.1;
+    double tmp2, f = 0., Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    double fac = -0.5 / (double)m_dim;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeRotation(m_rotation, rseed, m_dim);
+        m_peaks = m_peaks21;
+        unif(m_peaks, NHIGHPEAKS21 - 1, rseed);
+        m_rperm = m_rperm21;
+        for (i = 0; i < NHIGHPEAKS21 - 1; i++)
+            m_rperm[i] = i;
+
+		std::sort(m_rperm.begin(), m_rperm.begin() + NHIGHPEAKS21 - 1, compare_doubles(*this));
+
+        /* Random permutation*/
+
+        arrCondition[0] = sqrt(maxcondition);
+        peakvalues[0] = 10;
+        for (i = 1; i < NHIGHPEAKS21; i++)
+        {
+            arrCondition[i] = pow(maxcondition, (double)(m_rperm[i-1])/((double)(NHIGHPEAKS21-2)));
+            peakvalues[i] = (double)(i-1)/(double)(NHIGHPEAKS21-2) * (fitvalues[1] - fitvalues[0]) + fitvalues[0];
+        }
+        m_arrScales = m_arrScales21;
+        for (i = 0; i < NHIGHPEAKS21; i++)
+        {
+            unif(m_peaks, m_dim, rseed + 1000 * i);
+            for (j = 0; j < m_dim; j++)
+                m_rperm[j] = j;
+
+			std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
+
+            for (j = 0; j < m_dim; j++)
+            {
+                m_arrScales[i][j] = pow(arrCondition[i], ((double)m_rperm[j])/((double)(m_dim-1)) - 0.5);
+            }
+        }
+
+        unif(m_peaks, m_dim * NHIGHPEAKS21, rseed);
+        m_Xlocal = m_Xlocal21;
+        for (i = 0; i < m_dim; i++)
+        {
+            m_Xopt[i] = 0.8 * (10. * m_peaks[i] -5.);
+            for (j = 0; j < NHIGHPEAKS21; j++)
+            {
+                m_Xlocal[i][j] = 0.;
+                for (k = 0; k < m_dim; k++)
+                {
+                    m_Xlocal[i][j] += m_rotation[i][k] * (10. * m_peaks[j * m_dim + k] -5.);
+                }
+                if (j == 0)
+                    m_Xlocal[i][j] *= 0.8;
+            }
+        }
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++)
+        {
+            m_tmx[i] += m_rotation[i][j] * x[j];
+        }
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < NHIGHPEAKS21; i++)
+    {
+        tmp2 = 0.;
+        for (j = 0; j < m_dim; j++)
+        {
+            tmp2 += m_arrScales[i][j] * (m_tmx[j] - m_Xlocal[j][i]) * (m_tmx[j] - m_Xlocal[j][i]);
+        }
+        tmp2 = peakvalues[i] * exp(fac * tmp2);
+        f = fmax(f, tmp2);
+    }
+
+    f = 10 - f;
+    /*monotoneTFosc*/
+    if (f > 0)
+    {
+        Ftrue = log(f)/a;
+        Ftrue = pow(exp(Ftrue + 0.49*(sin(Ftrue) + sin(0.79*Ftrue))), a);
+    }
+    else if (f < 0)
+    {
+        Ftrue = log(-f)/a;
+        Ftrue = -pow(exp(Ftrue + 0.49*(sin(0.55 * Ftrue) + sin(0.31*Ftrue))), a);
+    }
+    else
+        Ftrue = f;
+
+    Ftrue *= Ftrue;
+
+    Fval = FUniform(Ftrue, 0.49 + 1./m_dim, 1.);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+    /* free(m_Xopt); //Not used!*/
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
+bbob2015::TwoDoubles bbob2015::f130(const decision_vector &x) const
+{
+    /* Gallagher with 101 Gaussian peaks with Cauchy noise, condition up to 1000, one global m_rotation*/
+
+    unsigned int i, j, k; /*Loop over dim*/
+	int rseed;
+
+    static int funcId = 130;
+    static int rrseed = 21;
+    static double fitvalues[2] = {1.1, 9.1};
+    static double maxcondition = 1000.;
+    static double arrCondition[NHIGHPEAKS21];
+    static double peakvalues[NHIGHPEAKS21];
+    static double a = 0.1;
+    double tmp2, f = 0., Fadd, Fval, tmp, Fpen = 0., Ftrue = 0.;
+    double fac = -0.5 / (double)m_dim;
+    bbob2015::TwoDoubles res;
+
+    if (!m_isInitDone)
+    {
+        rseed = rrseed + 10000 * m_trialid;
+        /*INITIALIZATION*/
+        m_Fopt = computeFopt(funcId, m_trialid);
+        computeRotation(m_rotation, rseed, m_dim);
+        m_peaks = m_peaks21;
+        unif(m_peaks, NHIGHPEAKS21 - 1, rseed);
+        m_rperm = m_rperm21;
+        for (i = 0; i < NHIGHPEAKS21 - 1; i++)
+            m_rperm[i] = i;
+
+		std::sort(m_rperm.begin(), m_rperm.begin() + NHIGHPEAKS21 - 1, compare_doubles(*this));
+
+        /* Random permutation*/
+
+        arrCondition[0] = sqrt(maxcondition);
+        peakvalues[0] = 10;
+        for (i = 1; i < NHIGHPEAKS21; i++)
+        {
+            arrCondition[i] = pow(maxcondition, (double)(m_rperm[i-1])/((double)(NHIGHPEAKS21-2)));
+            peakvalues[i] = (double)(i-1)/(double)(NHIGHPEAKS21-2) * (fitvalues[1] - fitvalues[0]) + fitvalues[0];
+        }
+        m_arrScales = m_arrScales21;
+        for (i = 0; i < NHIGHPEAKS21; i++)
+        {
+            unif(m_peaks, m_dim, rseed + 1000 * i);
+            for (j = 0; j < m_dim; j++)
+                m_rperm[j] = j;
+
+			std::sort(m_rperm.begin(), m_rperm.begin() + m_dim, compare_doubles(*this));
+
+            for (j = 0; j < m_dim; j++)
+            {
+                m_arrScales[i][j] = pow(arrCondition[i], ((double)m_rperm[j])/((double)(m_dim-1)) - 0.5);
+            }
+        }
+
+        unif(m_peaks, m_dim * NHIGHPEAKS21, rseed);
+        m_Xlocal = m_Xlocal21;
+        for (i = 0; i < m_dim; i++)
+        {
+            m_Xopt[i] = 0.8 * (10. * m_peaks[i] -5.);
+            for (j = 0; j < NHIGHPEAKS21; j++)
+            {
+                m_Xlocal[i][j] = 0.;
+                for (k = 0; k < m_dim; k++)
+                {
+                    m_Xlocal[i][j] += m_rotation[i][k] * (10. * m_peaks[j * m_dim + k] -5.);
+                }
+                if (j == 0)
+                    m_Xlocal[i][j] *= 0.8;
+            }
+        }
+        m_isInitDone = 1;
+    }
+    Fadd = m_Fopt;
+
+    /* BOUNDARY HANDLING*/
+    for (i = 0; i < m_dim; i++)
+    {
+        tmp = fabs(x[i]) - 5.;
+        if (tmp > 0.)
+        {
+            Fpen += tmp * tmp;
+        }
+    }
+    Fadd += 100. * Fpen;
+
+    /* TRANSFORMATION IN SEARCH SPACE*/
+    for (i = 0; i < m_dim; i++)
+    {
+        m_tmx[i] = 0.;
+        for (j = 0; j < m_dim; j++)
+        {
+            m_tmx[i] += m_rotation[i][j] * x[j];
+        }
+    }
+
+    /* COMPUTATION core*/
+    for (i = 0; i < NHIGHPEAKS21; i++)
+    {
+        tmp2 = 0.;
+        for (j = 0; j < m_dim; j++)
+        {
+            tmp2 += m_arrScales[i][j] * (m_tmx[j] - m_Xlocal[j][i]) * (m_tmx[j] - m_Xlocal[j][i]);
+        }
+        tmp2 = peakvalues[i] * exp(fac * tmp2);
+        f = fmax(f, tmp2);
+    }
+
+    f = 10 - f;
+    /*monotoneTFosc*/
+    if (f > 0)
+    {
+        Ftrue = log(f)/a;
+        Ftrue = pow(exp(Ftrue + 0.49*(sin(Ftrue) + sin(0.79*Ftrue))), a);
+    }
+    else if (f < 0)
+    {
+        Ftrue = log(-f)/a;
+        Ftrue = -pow(exp(Ftrue + 0.49*(sin(0.55 * Ftrue) + sin(0.31*Ftrue))), a);
+    }
+    else
+        Ftrue = f;
+
+    Ftrue *= Ftrue;
+
+    Fval = FCauchy(Ftrue, 1., 0.2);
+
+    Ftrue += Fadd;
+    Fval += Fadd;
+    /* free(m_Xopt); //Not used!*/
+
+    res.Fval = Fval;
+    res.Ftrue = Ftrue;
+    return res;
+}
+
 
 base_ptr bbob2015::clone() const
 {
