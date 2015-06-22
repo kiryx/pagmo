@@ -335,6 +335,10 @@ BOOST_PYTHON_MODULE(_problem) {
 		.def(init<unsigned int, problem::base::size_type, const std::string&>())
 		.add_property("origin_shift", &problem::cec2013::origin_shift, "Returns the origin shift used to define the problem");
 
+	//BBOB2015 benchmark functions.
+	problem_wrapper<problem::bbob2015>("bbob2015","BBOB2015 benchmark functions.")
+		.def(init<unsigned int, problem::base::size_type>());
+
 	// SNOPT toy problem.
 	problem_wrapper<problem::snopt_toyprob>("snopt_toyprob","SNOPT toy problem.");
 

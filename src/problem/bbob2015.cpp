@@ -40,20 +40,22 @@
 
 namespace pagmo{ namespace problem {
 
-bbob2015::bbob2015(unsigned int problem_number, problem::base::size_type dim):base_stochastic(dim,0)
+bbob2015::bbob2015(unsigned int problem_number, problem::base::size_type dim):base_stochastic(dim,0),m_problem_number(problem_number),m_dim(dim)
 {
-    m_problem_number = problem_number;
-    m_dim=dim;
+	if(m_dim <= 0)
+        pagmo_throw(value_error, "Invalid dimensions specified");
 
-    if (problem_number < handlesLength )
+    if (problem_number <= handlesLength )
         m_actFunc = handles[problem_number-1];
-    else if( (100 < problem_number) && (problem_number-101 < handlesNoisyLength) )
+    else if( (100 < problem_number) && (problem_number-101 <= handlesNoisyLength) )
         m_actFunc = handlesNoisy[problem_number - 101];
     else
         pagmo_throw(value_error, "problem_number specified is not a valid function of BBOB testbed");
 
     //All bbob problems have same bounds.
     set_bounds(-5,5);
+
+    initbenchmarks();
 }
 
 std::string bbob2015::get_name() const
@@ -74,15 +76,6 @@ void bbob2015::objfun_impl(fitness_vector &f, const decision_vector &x) const
 
     f[0] = res.Fval;
     return;
-}
-
-/* set the m_seed for the noise.
- * If the seeds are larger than 1e9 they are set back to 1 in randn and myrand.
- */
-void bbob2015::setNoiseSeed(unsigned int _seed, unsigned int _seedn) const
-{
-    m_seed = _seed;
-    m_seedn = _seedn;
 }
 
 void bbob2015::unif(std::vector<double> &r, unsigned int N, unsigned int inseed) const
@@ -355,6 +348,8 @@ void bbob2015::initbenchmarks(void) const
 
     for (i = 0; i < NHIGHPEAKS22; i++)
         m_arrScales22[i].resize(m_dim);
+
+    m_isInitDone = 0;
 
     return;
 }
@@ -4134,10 +4129,17 @@ bbob2015::TwoDoubles bbob2015::f130(const decision_vector &x) const
     return res;
 }
 
+void bbob2015::set_seed(unsigned int seed) const {
+	m_seed = seed;
+	m_seedn = seed;
+	// As the problem is now muted we must reset the caches that contain the evaluations w.r.t. the old seed
+	reset_caches();
+}
 
 base_ptr bbob2015::clone() const
 {
     return base_ptr(new bbob2015(*this));
 }
+}} //namespaces
 
-}}
+BOOST_CLASS_EXPORT_IMPLEMENT(pagmo::problem::bbob2015)

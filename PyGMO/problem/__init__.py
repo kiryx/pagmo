@@ -443,6 +443,25 @@ def _cec2013_ctor(self, prob_id=1, dim=10, path="input_data/"):
 cec2013._orig_init = cec2013.__init__
 cec2013.__init__ = _cec2013_ctor
 
+def _bbob2015_ctor(self, problem_number=1, dim=30):
+    """
+    Constructs one of the 54 BBOB2015 benchmark problems
+
+    USAGE: problem.bbob2015(problem_number=1, dim=10)
+    see http://coco.lri.fr/downloads/download15.02/bbobdocfunctionsdef.pdf
+    and http://coco.lri.fr/downloads/download15.02/bbobdocnoisyfunctionsdef.pdf
+    * problem_number: Problem number, one of [1,2,...24] OR [101,102,...130]
+    * dim: Problem's dimension (default is 30)
+
+    """
+    arg_list = []
+    arg_list.append(problem_number)
+    arg_list.append(dim)
+    self._orig_init(*arg_list)
+
+bbob2015._orig_init = bbob2015.__init__
+bbob2015.__init__ = _bbob2015_ctor
+
 
 def _luksan_vlcek_1_ctor(self, dim=3):
     """

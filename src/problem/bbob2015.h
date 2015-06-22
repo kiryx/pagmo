@@ -48,12 +48,11 @@ class __PAGMO_VISIBLE bbob2015 : public base_stochastic
     public:
         bbob2015(unsigned int = 1, problem::base::size_type = 30);
 
-        void setNoiseSeed(unsigned int _seed, unsigned int _seedn) const;
-
         base_ptr clone() const;
 
         std::string get_name() const;
 
+        void set_seed(unsigned int) const;
     protected:
         void objfun_impl(fitness_vector &, const decision_vector &) const;
 
@@ -71,7 +70,7 @@ class __PAGMO_VISIBLE bbob2015 : public base_stochastic
 
         bbobFunction m_actFunc = NULL;
 
-        unsigned int m_problem_number;
+        const unsigned int m_problem_number;
         double m_precision;
         unsigned int m_dim;
         unsigned int m_trialid = 1;
@@ -208,7 +207,16 @@ class __PAGMO_VISIBLE bbob2015 : public base_stochastic
             &bbob2015::f127, &bbob2015::f128, &bbob2015::f129, &bbob2015::f130};
         unsigned int handlesNoisyLength = 30;
 
+		friend class boost::serialization::access;
+		template <class Archive>
+		void serialize(Archive &ar, const unsigned int)
+		{
+			ar & boost::serialization::base_object<base>(*this);
+			ar & const_cast<unsigned int&>(m_problem_number);
+		}
 };
-}}
+}} //namespaces
+
+BOOST_CLASS_EXPORT_KEY(pagmo::problem::bbob2015)
 
 #endif
