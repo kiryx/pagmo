@@ -56,6 +56,15 @@ bbob2015::bbob2015(unsigned int problem_number, problem::base::size_type dim):ba
     set_bounds(-5,5);
 
     initbenchmarks();
+	
+	//initialize benchmark by calling it once and store 
+	decision_vector x(dim,0);
+	(this->*m_actFunc)(x);
+	
+	//set optimal decision vector
+	std::vector<decision_vector> xopt;
+	xopt.push_back(m_Xopt);
+	set_best_x(xopt);
 }
 
 std::string bbob2015::get_name() const
@@ -824,7 +833,7 @@ bbob2015::TwoDoubles bbob2015::f9(const decision_vector &x) const
         rseed = funcId + 10000 * m_trialid;
         /*INITIALIZATION*/
         m_Fopt = computeFopt(funcId, m_trialid);
-        /* computeXopt(rseed, DIM);*/
+
         computeRotation(m_rotation, rseed, m_dim);
         scales = fmax(1., sqrt((double)m_dim) / 8.);
         for (i = 0; i < m_dim; i ++)
@@ -832,7 +841,16 @@ bbob2015::TwoDoubles bbob2015::f9(const decision_vector &x) const
             for (j = 0; j < m_dim; j++)
                 m_linearTF[i][j] = scales * m_rotation[i][j];
         }
-
+		
+		//compute Xopt
+		for (i = 0; i < m_dim; i++)
+		{
+			m_Xopt[i] = 0.;
+			for (j = 0; j < m_dim; j++)
+			{
+				m_Xopt[i] += m_linearTF[j][i] * 0.5/scales/scales;
+			}
+		}
         m_isInitDone = 1;
     }
     Fadd = m_Fopt;
@@ -1454,7 +1472,7 @@ bbob2015::TwoDoubles bbob2015::f19(const decision_vector &x) const
         rseed = funcId + 10000 * m_trialid;
         /*INITIALIZATION*/
         m_Fopt = computeFopt(funcId, m_trialid);
-        /* computeXopt(rseed, DIM); Xopt is not used.*/
+
         scales = fmax(1., sqrt((double)m_dim) / 8.);
         computeRotation(m_rotation, rseed, m_dim);
         for (i = 0; i < m_dim; i ++)
@@ -1464,6 +1482,7 @@ bbob2015::TwoDoubles bbob2015::f19(const decision_vector &x) const
                 m_linearTF[i][j] = scales * m_rotation[i][j];
             }
         }
+		//compute Xopt
         for (i = 0; i < m_dim; i++)
         {
             m_Xopt[i] = 0.;
@@ -1522,6 +1541,7 @@ bbob2015::TwoDoubles bbob2015::f20(const decision_vector &x) const
         /*INITIALIZATION*/
         m_Fopt = computeFopt(funcId, m_trialid);
         unif(m_tmpvect, m_dim, rseed);
+		//compute Xopt
         for (i = 0; i < m_dim; i++)
         {
             m_Xopt[i] = 0.5 * 4.2096874633;
@@ -1635,6 +1655,7 @@ bbob2015::TwoDoubles bbob2015::f21(const decision_vector &x) const
         m_Xlocal = m_Xlocal21;
         for (i = 0; i < m_dim; i++)
         {
+			//compute Xopt
             m_Xopt[i] = 0.8 * (10. * m_peaks[i] -5.);
             for (j = 0; j < NHIGHPEAKS21; j++)
             {
@@ -1764,6 +1785,7 @@ bbob2015::TwoDoubles bbob2015::f22(const decision_vector &x) const
         m_Xlocal = m_Xlocal22;
         for (i = 0; i < m_dim; i++)
         {
+			//compute Xopt
             m_Xopt[i] = 0.8 * (9.8 * m_peaks[i] -4.9);
             for (j = 0; j < NHIGHPEAKS22; j++)
             {
@@ -1938,6 +1960,8 @@ bbob2015::TwoDoubles bbob2015::f24(const decision_vector &x) const
         computeRotation(m_rotation, rseed + 1000000, m_dim);
         computeRotation(m_rot2, rseed, m_dim);
         gauss(m_tmpvect, m_dim, rseed);
+		
+		//compute Xopt
         for (i = 0; i < m_dim; i++)
         {
             m_Xopt[i] = 0.5 * mu1;
@@ -3540,9 +3564,18 @@ bbob2015::TwoDoubles bbob2015::f125(const decision_vector &x) const
         rseed = rrseed + 10000 * m_trialid;
         /*INITIALIZATION*/
         m_Fopt = computeFopt(funcId, m_trialid);
-        /* computeXopt(rseed, m_dim);*/
         scales = fmax(1., sqrt((double)m_dim) / 8.);
         computeRotation(m_rotation, rseed, m_dim);
+		
+		//compute Xopt
+		for (i = 0; i < m_dim; i++)
+		{
+			m_Xopt[i] = 0.;
+			for (j = 0; j < m_dim; j++)
+			{
+				m_Xopt[i] += m_rotation[j][i] * 0.5/scales;
+			}
+		}
         m_isInitDone = 1;
     }
     Fadd = m_Fopt;
@@ -3605,9 +3638,19 @@ bbob2015::TwoDoubles bbob2015::f126(const decision_vector &x) const
         rseed = rrseed + 10000 * m_trialid;
         /*INITIALIZATION*/
         m_Fopt = computeFopt(funcId, m_trialid);
-        /* computeXopt(rseed, m_dim);*/
+
         scales = fmax(1., sqrt((double)m_dim) / 8.);
         computeRotation(m_rotation, rseed, m_dim);
+		
+		//compute Xopt
+		for (i = 0; i < m_dim; i++)
+		{
+			m_Xopt[i] = 0.;
+			for (j = 0; j < m_dim; j++)
+			{
+				m_Xopt[i] += m_rotation[j][i] * 0.5/scales;
+			}
+		}
         m_isInitDone = 1;
     }
     Fadd = m_Fopt;
@@ -3670,10 +3713,19 @@ bbob2015::TwoDoubles bbob2015::f127(const decision_vector &x) const
         rseed = rrseed + 10000 * m_trialid;
         /*INITIALIZATION*/
         m_Fopt = computeFopt(funcId, m_trialid);
-        /* computem_Xopt(rseed, m_dim);*/
+
         scales = fmax(1., sqrt((double)m_dim) / 8.);
         computeRotation(m_rotation, rseed, m_dim);
-
+		
+		//compute Xopt
+		for (i = 0; i < m_dim; i++)
+		{
+			m_Xopt[i] = 0.;
+			for (j = 0; j < m_dim; j++)
+			{
+				m_Xopt[i] += m_rotation[j][i] * 0.5/scales;
+			}
+		}
         m_isInitDone = 1;
     }
     Fadd = m_Fopt;
@@ -3778,6 +3830,7 @@ bbob2015::TwoDoubles bbob2015::f128(const decision_vector &x) const
         m_Xlocal = m_Xlocal21;
         for (i = 0; i < m_dim; i++)
         {
+			//compute Xopt
             m_Xopt[i] = 0.8 * (10. * m_peaks[i] -5.);
             for (j = 0; j < NHIGHPEAKS21; j++)
             {
@@ -3915,6 +3968,7 @@ bbob2015::TwoDoubles bbob2015::f129(const decision_vector &x) const
         m_Xlocal = m_Xlocal21;
         for (i = 0; i < m_dim; i++)
         {
+			//compute Xopt
             m_Xopt[i] = 0.8 * (10. * m_peaks[i] -5.);
             for (j = 0; j < NHIGHPEAKS21; j++)
             {
@@ -3927,7 +3981,7 @@ bbob2015::TwoDoubles bbob2015::f129(const decision_vector &x) const
                     m_Xlocal[i][j] *= 0.8;
             }
         }
-    m_isInitDone = 1;
+    	m_isInitDone = 1;
     }
     Fadd = m_Fopt;
 
@@ -4052,6 +4106,7 @@ bbob2015::TwoDoubles bbob2015::f130(const decision_vector &x) const
         m_Xlocal = m_Xlocal21;
         for (i = 0; i < m_dim; i++)
         {
+			//compute Xopt
             m_Xopt[i] = 0.8 * (10. * m_peaks[i] -5.);
             for (j = 0; j < NHIGHPEAKS21; j++)
             {

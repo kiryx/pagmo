@@ -71,7 +71,6 @@ class __PAGMO_VISIBLE bbob2015 : public base_stochastic
         bbobFunction m_actFunc = NULL;
 
         const unsigned int m_problem_number;
-        double m_precision;
         unsigned int m_dim;
         unsigned int m_trialid = 1;
         mutable unsigned int m_seedn;
