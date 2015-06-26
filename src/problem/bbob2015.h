@@ -33,16 +33,16 @@
 
 namespace pagmo{ namespace problem {
 
-    /// The BBOB 2015 problems: Real-Parameter Black-Box Optimization Benchmarking
-    /**
-    * This class allows to instantiate any of the 54 benchmark functions of
-    * Black-Box Optimization Benchmarking testbed for Real-Parameter
-    * Blackbox Optimization at CEC'2015.
-    *
-    * @see http://coco.gforge.inria.fr/doku.php?id=cec-bbob-2015
-    *
-    * @author Sunil Kumar Mahendrakar (sunil.mahendrakar19@gmail.com)
-    */
+/// The BBOB 2015 problems: Real-Parameter Black-Box Optimization Benchmarking
+/**
+* This class allows to instantiate any of the 54 benchmark functions of
+* Black-Box Optimization Benchmarking testbed for Real-Parameter
+* Blackbox Optimization at CEC'2015.
+*
+* @see http://coco.gforge.inria.fr/doku.php?id=cec-bbob-2015
+*
+* @author Sunil Kumar Mahendrakar (sunil.mahendrakar19@gmail.com)
+*/
 class __PAGMO_VISIBLE bbob2015 : public base_stochastic
 {
     public:
