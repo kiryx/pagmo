@@ -36,6 +36,7 @@
 
 #include "../config.h"
 #include "../serialization.h"
+#include "../population.h"
 #include "../problem/base.h"
 #include "../problem/base_meta.h"
 
@@ -53,7 +54,7 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
         bbob(const problem::base &, const std::string, const std::string);
 
         //finalize benchmarking
-        void finalize(void) const;
+        void finalize(population &) const;
 
         problem::base_ptr clone() const;
         std::string get_name() const;
@@ -90,7 +91,7 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
 
         //The default values for the LastEvalStruct structures
         LastEvalStruct m_lastEvalInit = {0, std::numeric_limits<double>::max(),
-            std::numeric_limits<double>::max(), {0}, 0};
+            std::numeric_limits<double>::max(), decision_vector(), 0};
 
         //Helper functions
         void writeNewIndexEntry(void) const; //Create a new index file and write an index entry

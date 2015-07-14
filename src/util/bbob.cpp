@@ -183,10 +183,10 @@ void bbob::objfun_impl(fitness_vector &f, const decision_vector &x) const
 //Subfunctions
 
 //write the comment line header in the data files
-void bbob::writeDataHeader(fs::path dataFile) const
+void bbob::writeDataHeader(fs::path dataFilePath) const
 {
     FILE * dataFileId;
-    bbobOpenFile(dataFileId, dataFile);
+    bbobOpenFile(dataFileId, dataFilePath);
 
     fprintf(dataFileId, "%% function evaluation | fitness - Fopt (%13.12e) | best fitness - Fopt | measured fitness | best measured fitness | x1 | x2...\n", m_bestF);
     fclose(dataFileId);
@@ -326,9 +326,9 @@ void bbob::restart(std::string restart_reason) const
   storeData(m_rdataFile, m_LastEval.num, m_LastEval.F, m_BestFEval.F, m_LastEval.x);
 }
 
-void bbob::finalize(void) const
+void bbob::finalize(population &pop) const
 {
-    writeFinalData();
+    (boost::dynamic_pointer_cast<bbob>(pagmo::population_access::get_problem_ptr(pop)))->writeFinalData();
 }
 
 std::string bbob::get_name() const
