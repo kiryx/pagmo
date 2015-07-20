@@ -51,7 +51,7 @@ namespace pagmo { namespace util {
 class __PAGMO_VISIBLE bbob : public problem::base_meta
 {
     public:
-        bbob(const problem::base &, const std::string, const std::string);
+        bbob(const problem::base &, const std::string, const std::string, const unsigned int = 1);
 
         //finalize benchmarking
         void finalize(population &) const;
@@ -95,7 +95,8 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
 
         //Helper functions
         void writeNewIndexEntry(void) const; //Create a new index file and write an index entry
-        void addDatIndexEntry(void) const; //Add index entry to existing index file
+        void addDatIndexEntry(void) const; //Add index entry to existing index file with data file name
+        void addIndexEntry(void) const; ////Add index entry to existing index file when the data file is same
         void writeFinalData(void) const; //Write Final data to log files.
         void storeBestF(std::vector<data> &, LastEvalStruct) const; //store best evaluation data to data vector at correct position.
         void storeData(std::vector<data> &, double, double, double, decision_vector) const; //Store data to be written to files in data vectors.
@@ -123,6 +124,7 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
         double m_precision = 1e-8; //The precision
         unsigned int m_instanceId = 1; //The instance ID
         mutable fs::path m_dataPath; //The path of the index and data files.
+        mutable fs::path m_dirPath; //The directory of the index and data files.
         mutable fs::path m_indexFilePath; //Index file name will be  ('f_%s.info', problem.get_name())
         mutable fs::path m_dataFilePath; //name of data file
         mutable fs::path m_hdataFilePath; //name of H-data file
