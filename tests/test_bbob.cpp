@@ -37,8 +37,8 @@ int main()
 	decision_vector x(10, 418.9828872724338);
 	bestx.push_back(x);
 	prob.set_best_x(bestx);
-	//We instantiate the algorithm differential evolution with 500 generations
-	pagmo::algorithm::pso algo;
+	//We instantiate the algorithm PSO with 10 generation
+	pagmo::algorithm::pso algo(10);
 
 	pagmo::util::bbob benchmarking(prob, "./", "PSO");
 	//1 - Evolution takes place on the same thread as main

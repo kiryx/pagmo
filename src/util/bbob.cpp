@@ -29,13 +29,13 @@
 
 namespace pagmo { namespace util {
 
-bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std::string algname) : problem::base_meta(p,
+bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std::string algname, unsigned int instanceId) : problem::base_meta(p,
                                 p.get_dimension(), // Ambiguous without the cast ...
                                 p.get_i_dimension(),
                                 1, //We can only benchmark using single objective functions.
                                 p.get_c_dimension(),
                                 p.get_ic_dimension(),
-                                p.get_c_tol()), m_algName(algname)
+                                p.get_c_tol()), m_algName(algname), m_instanceId(instanceId)
 {
     std::vector<fitness_vector> bestf = p.get_best_f();
 
@@ -64,32 +64,40 @@ bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std
     m_dataPath = fs::path(datapath);
 
     if(!fs::is_directory(m_dataPath))
-        pagmo_throw(value_error, "Given datapath is invalid");
+	{
+	    if(!fs::create_directory(m_dataPath)) //try to create a new directory
+	        pagmo_throw(std::runtime_error, "Invalid datapath given. Creating new directory failed");
+	}
 
-    fs::path function_dir(p.get_name()); //create a directory whose name is the function name.
+    m_dirPath = fs::path(p.get_name()); //create a directory whose name is the function name.
 
-    //index and data files are stored in <datapath>/<function_name>/func_dim[get_dimension()].dat or .tdat or .rdat
+    //index and data files are stored in <datapath>/<algorithm_name>/<function_name>/func_dim[get_dimension()].dat or .tdat or .rdat
 
-    if(!fs::is_directory(m_dataPath / function_dir)) //check if directory with the function name exists.
-        if(!fs::create_directory(m_dataPath / function_dir)) //try to create a new directory
-            pagmo_throw(value_error, "New directory could not be created, does given datapath has write permissions?");
+    if(!fs::is_directory(m_dataPath / m_dirPath)) //check if directory with the function name exists.
+        if(!fs::create_directory(m_dataPath / m_dirPath)) //try to create a new directory
+            pagmo_throw(std::runtime_error, "New directory could not be created, does given datapath has write permissions?");
 
     fs::path index_filename(boost::str(boost::format("f_%1%.info") % p.get_name()));
     m_indexFilePath = m_dataPath / index_filename;
 
-    if(!fs::is_regular_file(m_indexFilePath))
-        writeNewIndexEntry(); //create new index file and add new index entry
-    else
-        addDatIndexEntry(); //add information to existing index file
-
     fs::path data_filename(boost::str(boost::format("func_dim[%1%].tdat") % p.get_dimension()));
-    m_dataFilePath = m_dataPath / function_dir / data_filename;
+    m_dataFilePath = m_dataPath / m_dirPath / data_filename;
 
     fs::path hdata_filename(boost::str(boost::format("func_dim[%1%].dat") % p.get_dimension()));
-    m_hdataFilePath = m_dataPath / function_dir / hdata_filename;
+    m_hdataFilePath = m_dataPath / m_dirPath / hdata_filename;
 
     fs::path rdata_filename(boost::str(boost::format("func_dim[%1%].rdat") % p.get_dimension()));
-    m_rdataFilePath = m_dataPath / function_dir / rdata_filename;
+    m_rdataFilePath = m_dataPath / m_dirPath / rdata_filename;
+
+
+    if(!fs::is_regular_file(m_indexFilePath))
+        writeNewIndexEntry(); //create new index file and add new index entry
+
+    else if(!fs::is_regular_file(m_dataFilePath)) //check if we already have a datafile with same parameters
+        addDatIndexEntry(); //add information about the datafile to existing index file
+
+    else
+        addIndexEntry();
 
     writeDataHeader(m_dataFilePath);
     writeDataHeader(m_hdataFilePath);
@@ -207,8 +215,9 @@ void bbob::writeNewIndexEntry(void) const
     if(newline == 1)
         fprintf(indexFileId,"\n");
 
-    fprintf(indexFileId, "func = %s, DIM = %lu, Precision = %.3e, algId = '%s'\n", m_original_problem->get_name().c_str(), get_dimension(), m_precision, m_algName.c_str());
-    fprintf(indexFileId,"%% %s\n%s", m_comments.c_str(), (m_hdataFilePath.filename()).c_str());
+    fprintf(indexFileId, "funcId = '%s', DIM = %lu, Precision = %.3e, Fopt = %13.12e, algId = '%s'\n", m_original_problem->get_name().c_str(),
+		get_dimension(), m_precision, m_bestF, m_algName.c_str());
+    fprintf(indexFileId,"%% %s\n%s, %d", m_comments.c_str(), (m_dirPath / m_hdataFilePath.filename()).c_str(), m_instanceId);
     fclose(indexFileId);
 }
 
@@ -219,9 +228,25 @@ void bbob::addDatIndexEntry(void) const
 
     indexFileId = fopen(m_indexFilePath.c_str(), "a");
     if(indexFileId == NULL)
-        pagmo_throw(value_error, "Could not open index file.");
+        pagmo_throw(std::runtime_error, "Could not open index file.");
 
-    fprintf(indexFileId,", %s, %d", (m_hdataFilePath.filename()).c_str(), m_instanceId);
+    fprintf(indexFileId,", %s, %d", (m_dirPath / m_hdataFilePath.filename()).c_str(), m_instanceId);
+    fclose(indexFileId);
+}
+
+//Open the index file and write a new index entry */
+void bbob::addIndexEntry(void) const
+{
+    FILE * indexFileId;
+
+    if (!fs::is_regular_file(m_indexFilePath))
+        pagmo_throw(std::runtime_error, "Could not find index file");
+
+    indexFileId = fopen(m_indexFilePath.c_str(), "a");
+    if (indexFileId == NULL)
+        pagmo_throw(std::runtime_error, "Could not find index file");
+
+    fprintf(indexFileId,", %d", m_instanceId);
     fclose(indexFileId);
 }
 
@@ -314,7 +339,7 @@ void bbob::bbobOpenFile(FILE* &fileId, fs::path fileName) const
 {
     fileId = fopen(fileName.c_str(), "a");
     if(fileId == NULL)
-        pagmo_throw(value_error, "Could not open file");
+        pagmo_throw(std::runtime_error, "Could not open file");
 }
 
 void bbob::restart(std::string restart_reason) const
