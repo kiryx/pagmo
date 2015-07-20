@@ -52,6 +52,7 @@
 // TODO: serialize the functors.. allocator, Hash, Pred, etc.
 #include <boost/circular_buffer.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/filesystem/path.hpp>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 #include <string>
@@ -267,6 +268,30 @@ void serialize(Archive &ar, boost::vecS &cb, const unsigned int version)
 	(void)(version);
 }
 
+// ---------- boost::filesystem::path -------
+// Serialization of boost::filesystem::path
+template <class Archive>
+void save(Archive &ar, boost::filesystem::path &path, const unsigned int)
+{ 
+	std::stringstream ss;
+	ss << path.string();
+	std::string tmp(ss.str());
+	ar << tmp;
+}
+
+template <class Archive>
+void load(Archive &ar, boost::filesystem::path &p, const unsigned int)
+{ 
+	std::stringstream ss;
+	ar >> ss;
+	p = ss.str();
+}
+
+template <class Archive>
+void serialize(Archive &ar, boost::filesystem::path &path, const unsigned int version)
+{
+	split_free(ar, path, version);
+}
 
 // ---------- boost::normal_distribution<double> ----------
 // Serialization of boost::normal_distribution<double> exploits the fact that the

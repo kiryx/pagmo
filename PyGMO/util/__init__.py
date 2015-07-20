@@ -3,7 +3,7 @@ from PyGMO.util._util import *
 from PyGMO.util._analysis import *
 from PyGMO.util._tsp import read_tsplib
 
-__all__ = ['hypervolume', 'hv_algorithm', 'tsp']
+__all__ = ['hypervolume', 'hv_algorithm', 'tsp', 'bbob']
 
 
 hv_algorithm.__doc__ = """Module containing available algorithms for the hypervolume computation
@@ -748,3 +748,24 @@ def _race_algo_run(
 
 race_algo._orig_run = race_algo.run
 race_algo.run = _race_algo_run
+
+
+def _bbob_ctor(self, problem=None, datapath="./", algname="", instanceId=1):
+    """
+    Constructs a meta-problem for BBOB benchmarking.
+    USAGE: bbob(problem, datapath, algname, instanceId)
+    
+    * problem: The problem to be used as benchmark
+    * datapath: The data path where log files will be stored
+    * algname: The name of the optimizer used like PSO
+    * instanceId: Id of the instance
+    """
+    arg_list = []
+    arg_list.append(problem)
+    arg_list.append(datapath)
+    arg_list.append(algname)
+    arg_list.append(instanceId)
+    self._orig_init(*arg_list)
+
+bbob._orig_init = bbob.__init__
+bbob.__init__ = _bbob_ctor

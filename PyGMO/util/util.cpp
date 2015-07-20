@@ -26,7 +26,7 @@
 #ifdef _WIN32
 #include <cmath>
 #endif
- 
+
 #include <Python.h>
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/python/class.hpp>
@@ -42,6 +42,7 @@
 #include "../../src/util/discrepancy.h"
 #include "../../src/util/race_pop.h"
 #include "../../src/util/race_algo.h"
+#include "../../src/util/bbob.h"
 #include "../utils.h"
 
 #include "../../src/util/hv_algorithm/base.h"
@@ -174,6 +175,19 @@ void expose_hypervolume()
 		.def("get_verify", &util::hypervolume::get_verify);
 }
 
+void expose_bbob()
+{
+	//BBOB meta-problem for benchmarking.
+	class_<util::bbob>("bbob","BBOB meta-problem for using a pagmo::problem as benchmark",init<const util::bbob &>())
+	.def(init<>())
+	.def("__copy__", &Py_copy_from_ctor<util::bbob>)
+	.def("__deepcopy__", &Py_deepcopy_from_ctor<util::bbob>)
+	.def_pickle(python_class_pickle_suite<util::bbob>())
+	.def("cpp_loads", &py_cpp_loads<util::bbob>)
+	.def("cpp_dumps", &py_cpp_dumps<util::bbob>)
+	.def(init<pagmo::problem::base &, std::string, std::string, unsigned int>());	
+}
+
 // Main method containing all the juice of race_pop
 static inline boost::python::tuple race_pop_run_return_tuple(
 	racing::race_pop& race_obj,
@@ -273,7 +287,7 @@ BOOST_PYTHON_MODULE(_util) {
 	class_<racing::race_algo>("race_algo", init<const std::vector<pagmo::algorithm::base_ptr> &, const pagmo::problem::base &, unsigned int, unsigned int>())
 	.def(init<const std::vector<pagmo::algorithm::base_ptr> &, const std::vector<pagmo::problem::base_ptr> &, unsigned int, unsigned int>())
 	.def("run", &race_algo_run_return_tuple, "Race the algorithms");
-	
+
 	// Hypervolumes
 	expose_hypervolume();
 	scope current;
@@ -284,4 +298,6 @@ BOOST_PYTHON_MODULE(_util) {
 	current.attr("hv_algorithm") = submodule;
 	scope submoduleScope = submodule;
 	expose_hv_algorithm();
+	
+	expose_bbob();
 }
