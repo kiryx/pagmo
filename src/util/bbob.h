@@ -22,8 +22,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.               *
  *****************************************************************************/
 
-#ifndef PAGMO_UTIL_BBOB2015_H
-#define PAGMO_UTIL_BBOB2015_H
+#ifndef PAGMO_UTIL_BBOB_H
+#define PAGMO_UTIL_BBOB_H
 
 #include <iostream>
 #include <string>
@@ -51,7 +51,7 @@ namespace pagmo { namespace util {
 class __PAGMO_VISIBLE bbob : public problem::base_meta
 {
     public:
-        bbob(const problem::base &, const std::string, const std::string, const unsigned int = 1);
+        bbob(const problem::base & = problem::ackley(1), const std::string = "./", const std::string = "", const unsigned int = 1);
 
         //finalize benchmarking
         void finalize(population &) const;
@@ -70,6 +70,7 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
             double bestF; //best fitness value till now
             decision_vector x; //decision vector
             int isWritten; //is it written to file?
+			
         };
 
         typedef struct lastEvalStruct LastEvalStruct;
@@ -140,5 +141,7 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
 };
 
 }}
+
+BOOST_CLASS_EXPORT_KEY(pagmo::util::bbob)
 
 #endif

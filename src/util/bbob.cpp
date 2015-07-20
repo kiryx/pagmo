@@ -22,9 +22,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.               *
  *****************************************************************************/
 
-#ifndef PAGMO_UTIL_BBOB_H
-#define PAGMO_UTIL_BBOB_H
-
 #include "bbob.h"
 
 namespace pagmo { namespace util {
@@ -371,4 +368,4 @@ problem::base_ptr bbob::clone() const
 
 }} //namespace
 
-#endif
+BOOST_CLASS_EXPORT_IMPLEMENT(pagmo::util::bbob)
