@@ -178,14 +178,14 @@ void expose_hypervolume()
 void expose_bbob()
 {
 	//BBOB meta-problem for benchmarking.
-	class_<util::bbob>("bbob","BBOB meta-problem for using a pagmo::problem as benchmark",init<const util::bbob &>())
-	.def(init<>())
-	.def("__copy__", &Py_copy_from_ctor<util::bbob>)
-	.def("__deepcopy__", &Py_deepcopy_from_ctor<util::bbob>)
-	.def_pickle(python_class_pickle_suite<util::bbob>())
-	.def("cpp_loads", &py_cpp_loads<util::bbob>)
-	.def("cpp_dumps", &py_cpp_dumps<util::bbob>)
-	.def(init<pagmo::problem::base &, std::string, std::string, unsigned int>());	
+	class_<util::bbob>("bbob","BBOB meta-problem for using a pagmo::problem as benchmark", init<const util::bbob &>())
+		.def(init<>())
+		.def("__copy__", &Py_copy_from_ctor<util::bbob>)
+		.def("__deepcopy__", &Py_deepcopy_from_ctor<util::bbob>)
+		.def_pickle(python_class_pickle_suite<util::bbob>())
+		.def("cpp_loads", &py_cpp_loads<util::bbob>)
+		.def("cpp_dumps", &py_cpp_dumps<util::bbob>)
+		.def(init<pagmo::problem::base &, std::string, std::string, unsigned int>());
 }
 
 // Main method containing all the juice of race_pop
@@ -288,6 +288,9 @@ BOOST_PYTHON_MODULE(_util) {
 	.def(init<const std::vector<pagmo::algorithm::base_ptr> &, const std::vector<pagmo::problem::base_ptr> &, unsigned int, unsigned int>())
 	.def("run", &race_algo_run_return_tuple, "Race the algorithms");
 
+	// BBOB module
+	expose_bbob();
+
 	// Hypervolumes
 	expose_hypervolume();
 	scope current;
@@ -298,6 +301,4 @@ BOOST_PYTHON_MODULE(_util) {
 	current.attr("hv_algorithm") = submodule;
 	scope submoduleScope = submodule;
 	expose_hv_algorithm();
-	
-	expose_bbob();
 }
