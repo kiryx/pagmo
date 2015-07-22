@@ -27,6 +27,8 @@ before_install:
   - tar -xjf cmake.tar.bz2
   - rm cmake.tar.bz2
   - export PATH=$(pwd)/cmake/bin:$PATH
+  - sudo apt-get install python-pip
+  - sudo pip install numpy
 
 install:
   # Get boost
