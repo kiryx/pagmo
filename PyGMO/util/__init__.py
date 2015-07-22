@@ -2,8 +2,9 @@
 from PyGMO.util._util import *
 from PyGMO.util._analysis import *
 from PyGMO.util._tsp import read_tsplib
+from PyGMO.util import _bbob_pproc as bbob_pproc
 
-__all__ = ['hypervolume', 'hv_algorithm', 'tsp']
+__all__ = ['hypervolume', 'hv_algorithm', 'tsp', 'bbob_pproc']
 
 
 hv_algorithm.__doc__ = """Module containing available algorithms for the hypervolume computation
