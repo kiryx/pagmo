@@ -37,16 +37,19 @@ int main()
 	decision_vector x(10, 418.9828872724338);
 	bestx.push_back(x);
 	prob.set_best_x(bestx);
-	//We instantiate the algorithm PSO with 10 generation
-	pagmo::algorithm::pso algo(10);
+	
+	for(unsigned int instance=1; instance<15; instance++)
+	{
+		//We instantiate the algorithm PSO with 5000 generation
+		pagmo::algorithm::pso algo(5000);
 
-	pagmo::util::bbob benchmarking(prob, "./", "PSO");
-	//1 - Evolution takes place on the same thread as main
-	//We instantiate a population containing 20 candidate solutions to the Schwefel problem
-	pagmo::population pop(benchmarking,20, 1);
-	algo.evolve(pop);
+		pagmo::util::bbob benchmarking(prob, "./", "PSO", instance);
+		//1 - Evolution takes place on the same thread as main
+		//We instantiate a population containing 20 candidate solutions to the Schwefel problem
+		pagmo::population pop(benchmarking, 50, 1);
+		algo.evolve(pop);
 
-	benchmarking.finalize(pop);
-
+		benchmarking.finalize(pop);
+	}
 	return 0;
 }
