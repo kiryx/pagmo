@@ -498,7 +498,7 @@ def plot(dsList, targets = single_target_values, **plotArgs):
     evalfmax = maxEvalsFactor
     for j in range(len(targets)):
         tmpplotArgs = dict(plotArgs, **rldStyles[j % len(rldStyles)])
-        tmp = plotRLDistr(dsList, lambda fun_dim: targets(fun_dim)[j], **tmpplotArgs)
+        tmp = plotRLDistr(dsList, lambda fun_dim: targets(fun_dim)[j], targets.loglabel(j), **tmpplotArgs)
         res.extend(tmp)
     res.append(plt.axvline(x = maxEvalsFactor, color = 'k', **plotArgs))
     funcs = list(i.funcId for i in dsList)
@@ -506,6 +506,8 @@ def plot(dsList, targets = single_target_values, **plotArgs):
     res.append(plt.text(0.5, 0.98, text, horizontalalignment = "center",
                         verticalalignment = "top", transform = plt.gca().transAxes))
 
+    res.append(plt.legend(loc = 'best'))
+    
     plt.subplot(122)
     for j in [range(len(targets))[-1]]:
         tmpplotArgs = dict(plotArgs, **rldStyles[j % len(rldStyles)])
