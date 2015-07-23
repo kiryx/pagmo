@@ -29,6 +29,7 @@ before_install:
   - export PATH=$(pwd)/cmake/bin:$PATH
   - sudo apt-get install python-pip
   - sudo pip install numpy
+  - sudo pip install matplotlib
 
 install:
   # Get boost
