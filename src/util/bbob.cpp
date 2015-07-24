@@ -26,13 +26,15 @@
 
 namespace pagmo { namespace util {
 
-bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std::string algname, unsigned int instanceId) : problem::base_meta(p,
+bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std::string algname, unsigned int instanceId, std::string comments) : problem::base_meta(p,
                                 p.get_dimension(), // Ambiguous without the cast ...
                                 p.get_i_dimension(),
                                 1, //We can only benchmark using single objective functions.
                                 p.get_c_dimension(),
                                 p.get_ic_dimension(),
-                                p.get_c_tol()), m_algName(algname), m_instanceId(instanceId)
+                                p.get_c_tol()), m_algName(algname),
+								m_instanceId(instanceId),
+								m_comments(comments)
 {
     std::vector<fitness_vector> bestf = p.get_best_f();
 
@@ -61,10 +63,10 @@ bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std
     m_dataPath = fs::path(datapath);
 
     if(!fs::is_directory(m_dataPath))
-	{
-	    if(!fs::create_directory(m_dataPath)) //try to create a new directory
-	        pagmo_throw(std::runtime_error, "Invalid datapath given. Creating new directory failed");
-	}
+    {
+        if(!fs::create_directory(m_dataPath)) //try to create a new directory
+            pagmo_throw(std::runtime_error, "Invalid datapath given. Creating new directory failed");
+    }
 
     m_dirPath = fs::path(p.get_name()); //create a directory whose name is the function name.
 
@@ -90,11 +92,14 @@ bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std
     if(!fs::is_regular_file(m_indexFilePath))
         writeNewIndexEntry(); //create new index file and add new index entry
 
-    else if(!fs::is_regular_file(m_dataFilePath)) //check if we already have a datafile with same parameters
-        addDatIndexEntry(); //add information about the datafile to existing index file
-
-    else
-        addIndexEntry();
+    else //check if algorithm, precision and comment are same
+	{
+		//if same
+		addIndexEntry();
+		
+		//Parameters changed
+		//writeNewIndexEntry();
+	}
 
     writeDataHeader(m_dataFilePath);
     writeDataHeader(m_hdataFilePath);
@@ -213,21 +218,8 @@ void bbob::writeNewIndexEntry(void) const
         fprintf(indexFileId,"\n");
 
     fprintf(indexFileId, "funcId = '%s', DIM = %lu, Precision = %.3e, Fopt = %13.12e, algId = '%s'\n", m_original_problem->get_name().c_str(),
-		get_dimension(), m_precision, m_bestF, m_algName.c_str());
+        get_dimension(), m_precision, m_bestF, m_algName.c_str());
     fprintf(indexFileId,"%% %s\n%s, %d", m_comments.c_str(), (m_dirPath / m_hdataFilePath.filename()).c_str(), m_instanceId);
-    fclose(indexFileId);
-}
-
-//Open the index file and write a new index entry.
-void bbob::addDatIndexEntry(void) const
-{
-    FILE * indexFileId;
-
-    indexFileId = fopen(m_indexFilePath.c_str(), "a");
-    if(indexFileId == NULL)
-        pagmo_throw(std::runtime_error, "Could not open index file.");
-
-    fprintf(indexFileId,", %s, %d", (m_dirPath / m_hdataFilePath.filename()).c_str(), m_instanceId);
     fclose(indexFileId);
 }
 

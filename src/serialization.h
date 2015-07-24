@@ -48,7 +48,7 @@
 #include <boost/serialization/version.hpp>
 #include <limits>
 
-// Serialization of circular buffer, unordered map.
+// Serialization of circular buffer, unordered map and filesystem::path.
 // TODO: serialize the functors.. allocator, Hash, Pred, etc.
 #include <boost/circular_buffer.hpp>
 #include <boost/unordered_map.hpp>
@@ -271,20 +271,17 @@ void serialize(Archive &ar, boost::vecS &cb, const unsigned int version)
 // ---------- boost::filesystem::path -------
 // Serialization of boost::filesystem::path
 template <class Archive>
-void save(Archive &ar, boost::filesystem::path &path, const unsigned int)
-{ 
-	std::stringstream ss;
-	ss << path.string();
-	std::string tmp(ss.str());
-	ar << tmp;
+void save(Archive &ar, const boost::filesystem::path &path, const unsigned int)
+{
+	ar << path.string();
 }
 
 template <class Archive>
 void load(Archive &ar, boost::filesystem::path &p, const unsigned int)
 { 
-	std::stringstream ss;
+	std::string ss;
 	ar >> ss;
-	p = ss.str();
+	p = ss;
 }
 
 template <class Archive>
