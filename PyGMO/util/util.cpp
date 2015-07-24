@@ -178,13 +178,14 @@ void expose_hypervolume()
 void expose_bbob()
 {
 	//BBOB meta-problem for benchmarking.
-	class_<util::bbob>("bbob","BBOB meta-problem for using a pagmo::problem as benchmark", init<const util::bbob &>())
+	class_<util::bbob, bases<problem::base> >("bbob","BBOB meta-problem for using a pagmo::problem as benchmark", init<const util::bbob &>())
 		.def(init<>())
 		.def("__copy__", &Py_copy_from_ctor<util::bbob>)
 		.def("__deepcopy__", &Py_deepcopy_from_ctor<util::bbob>)
 		.def_pickle(python_class_pickle_suite<util::bbob>())
 		.def("cpp_loads", &py_cpp_loads<util::bbob>)
 		.def("cpp_dumps", &py_cpp_dumps<util::bbob>)
+		.def("finalize", &util::bbob::finalize)
 		.def(init<pagmo::problem::base &, std::string, std::string, unsigned int>());
 }
 
