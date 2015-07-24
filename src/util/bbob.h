@@ -30,9 +30,12 @@
 #include <stdio.h>
 #include <vector>
 #include <fstream>
+#include<sstream>
 #include <limits>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 #include "../config.h"
 #include "../serialization.h"
@@ -122,7 +125,7 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
         void storeBestF(std::vector<data> &, LastEvalStruct) const; //store best evaluation data to data vector at correct position.
         void storeData(std::vector<data> &, double, double, double, decision_vector) const; //Store data to be written to files in data vectors.
         void writeDataHeader(fs::path) const; //Write headers to files.
-        void bbobOpenFile(FILE* &, fs::path) const; //Open file and return fileId
+        void bbobOpenFile(std::ofstream &, fs::path) const; //Open file and return fileId
         void writeData(fs::path, std::vector<data> &) const; //Write data from vectors to data files.
         void restart(std::string) const; //write to restart log.
 
