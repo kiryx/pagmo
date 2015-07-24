@@ -33,8 +33,8 @@ bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std
                                 p.get_c_dimension(),
                                 p.get_ic_dimension(),
                                 p.get_c_tol()), m_algName(algname),
-								m_instanceId(instanceId),
-								m_comments(comments)
+                                m_instanceId(instanceId),
+                                m_comments(comments)
 {
     std::vector<fitness_vector> bestf = p.get_best_f();
 
@@ -92,14 +92,92 @@ bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std
     if(!fs::is_regular_file(m_indexFilePath))
         writeNewIndexEntry(); //create new index file and add new index entry
 
-    else //check if algorithm, precision and comment are same
-	{
-		//if same
-		addIndexEntry();
-		
-		//Parameters changed
-		//writeNewIndexEntry();
-	}
+    else //check if dimensions, precision, algorithm and comments are same
+    {
+        unsigned int found=0;
+        unsigned int old_dim;
+        double old_precision;
+        std::string old_algname;
+        std::string old_comments;
+        std::ifstream indexfile;
+        std::string line;
+        std::vector<std::string> tokens;
+
+        indexfile.open(m_indexFilePath.string());
+
+        while(!indexfile.eof())
+        {
+            //read line
+            std::getline(indexfile, line);
+
+            //skip comments
+            if(line[0] == '%')
+                continue;
+
+            //try to find "funcId = "
+            std::string pattern("funcId = ");
+            std::size_t position = line.find(pattern);
+            if(position != std::string::npos) //required line
+            {
+                found = 0;
+                boost::split(tokens, line, boost::is_any_of(","));
+
+                for(int i = 0; i < tokens.size(); i++)
+                {
+                    //get dimensions
+                    pattern = "DIM = ";
+                    position = tokens[i].find(pattern);
+                    if(position != std::string::npos)
+                    {
+                        position += pattern.length();
+                        std::istringstream ss(tokens[i].substr(position));
+                        ss >> old_dim;
+
+                        if(old_dim == p.get_dimension())
+                            found++;
+                    }
+
+                    //get precision
+                    pattern = "Precision = ";
+                    position = tokens[i].find(pattern);
+                    if(position != std::string::npos)
+                    {
+                        position += pattern.length();
+                        std::istringstream ss(tokens[i].substr(position));
+                        ss >> old_precision;
+
+                        if(fabs(old_precision - m_precision) < 1e-10)
+                            found++;
+                    }
+
+                    //get algorithm name
+                    pattern = "algId = '";
+                    position = tokens[i].find(pattern);
+                    if(position != std::string::npos)
+                    {
+                        position += pattern.length();
+                        old_algname = tokens[i].substr(position, tokens[i].length() - position - 1); //remove '
+
+                        if(old_algname.compare(algname) == 0)
+                            found++;
+                    }
+
+                    //compare comments
+                    std::getline(indexfile, line);
+
+                    //skip %
+                    if(m_comments.compare(line.substr(1, line.length() - 2)) == 0)
+                        found++;
+                }
+            }
+        }
+        indexfile.close();
+        if(found == 4) //if all parameters are same for the last run
+            addIndexEntry();
+
+        else //Parameters changed
+            writeNewIndexEntry();
+    }
 
     writeDataHeader(m_dataFilePath);
     writeDataHeader(m_hdataFilePath);
@@ -112,8 +190,6 @@ void bbob::objfun_impl(fitness_vector &f, const decision_vector &x) const
     unsigned int boolImprovement = 0;
     double Fvalue;
     double evalsj;
-    FILE * dataFileId;
-    FILE * hdataFileId;
 
     m_original_problem->objfun(f, x);
     Fvalue = f[0];
@@ -195,54 +271,52 @@ void bbob::objfun_impl(fitness_vector &f, const decision_vector &x) const
 //write the comment line header in the data files
 void bbob::writeDataHeader(fs::path dataFilePath) const
 {
-    FILE * dataFileId;
-    bbobOpenFile(dataFileId, dataFilePath);
+    std::ofstream dataFile;
+    bbobOpenFile(dataFile, dataFilePath);
 
-    fprintf(dataFileId, "%% function evaluation | fitness - Fopt (%13.12e) | best fitness - Fopt | measured fitness | best measured fitness | x1 | x2...\n", m_bestF);
-    fclose(dataFileId);
+    dataFile << boost::str(boost::format("%% function evaluation | fitness - Fopt (%13.12e) | best fitness - Fopt | measured fitness | best measured fitness | x1 | x2...\n")
+        % m_bestF);
+    dataFile.close();
 }
 
 //open the index file and write a new index entry
 void bbob::writeNewIndexEntry(void) const
 {
-    FILE * indexFileId;
+    std::ofstream indexFile;
     int newline = 1;
     if(!fs::is_regular_file(m_indexFilePath))
         newline = 0;
 
-    indexFileId = fopen(m_indexFilePath.c_str(), "a");
+    bbobOpenFile(indexFile, m_indexFilePath);
 
-    if(indexFileId == NULL)
-        pagmo_throw(value_error, "Could not open index file.");
     if(newline == 1)
-        fprintf(indexFileId,"\n");
+        indexFile <<"\n";
 
-    fprintf(indexFileId, "funcId = '%s', DIM = %lu, Precision = %.3e, Fopt = %13.12e, algId = '%s'\n", m_original_problem->get_name().c_str(),
-        get_dimension(), m_precision, m_bestF, m_algName.c_str());
-    fprintf(indexFileId,"%% %s\n%s, %d", m_comments.c_str(), (m_dirPath / m_hdataFilePath.filename()).c_str(), m_instanceId);
-    fclose(indexFileId);
+    indexFile << boost::str(boost::format("funcId = '%s', DIM = %lu, Precision = %.3e, Fopt = %13.12e, algId = '%s'\n") % m_original_problem->get_name() %
+        get_dimension() % m_precision % m_bestF % m_algName);
+
+    indexFile << boost::str(boost::format("%% %s\n%s, %d") % m_comments % (m_dirPath / m_hdataFilePath.filename()).string() % m_instanceId);
+    indexFile.close();
 }
 
 //Open the index file and write a new index entry */
 void bbob::addIndexEntry(void) const
 {
-    FILE * indexFileId;
+    std::ofstream indexFile;
 
     if (!fs::is_regular_file(m_indexFilePath))
         pagmo_throw(std::runtime_error, "Could not find index file");
 
-    indexFileId = fopen(m_indexFilePath.c_str(), "a");
-    if (indexFileId == NULL)
-        pagmo_throw(std::runtime_error, "Could not find index file");
+    bbobOpenFile(indexFile, m_indexFilePath);
 
-    fprintf(indexFileId,", %d", m_instanceId);
-    fclose(indexFileId);
+    indexFile << boost::str(boost::format(", %d") % m_instanceId);
+    indexFile.close();
 }
 
 //complete the data file with unwritten information
 void bbob::writeFinalData(void) const
 {
-    FILE * indexFileId;
+    std::ofstream indexFile;
 
     if(!m_BestFEval.isWritten)
     {
@@ -260,9 +334,9 @@ void bbob::writeFinalData(void) const
         storeData(m_dataFile, m_LastEval.num, m_LastEval.F, m_BestFEval.F, m_LastEval.x);
 
     //now the index file
-    bbobOpenFile(indexFileId, m_indexFilePath);
-    fprintf(indexFileId, ":%.0f|%.1e", m_LastEval.num, m_BestFEval.F - m_bestF - m_precision);
-    fclose(indexFileId);
+    bbobOpenFile(indexFile, m_indexFilePath);
+    indexFile << boost::str(boost::format(":%.0f|%.1e") % m_LastEval.num % (m_BestFEval.F - m_bestF - m_precision));
+    indexFile.close();
 
     //now write the data from data vectors to files.
     writeData(m_dataFilePath, m_dataFile);
@@ -309,34 +383,34 @@ void bbob::storeData(std::vector<data> &vec, double evals, double F, double best
 //write a formatted line into a data file
 void bbob::writeData(fs::path file, std::vector<data> &vec) const
 {
-    FILE * fout;
+    std::ofstream fout;
     bbobOpenFile(fout, file);
 
     for(int i=0; i<vec.size(); i++)
     {
-        fprintf(fout, "%.0f %+10.9e %+10.9e %+10.9e %+10.9e", vec[i].num, vec[i].F-m_bestF, vec[i].bestF-m_bestF, vec[i].F, vec[i].bestF);
+        fout << boost::str(boost::format("%.0f %+10.9e %+10.9e %+10.9e %+10.9e") % vec[i].num % (vec[i].F-m_bestF) % (vec[i].bestF-m_bestF) % (vec[i].F) % vec[i].bestF);
         if(vec[i].x.size() < 22)
             for(int j=0; j<vec[i].x.size(); j++)
-                fprintf(fout, " %+5.4e", vec[i].x[j]);
-        fprintf(fout, "\n");
+                fout << boost::str(boost::format(" %+5.4e") % vec[i].x[j]);
+        fout << "\n";
     }
-    fclose(fout);
+    fout.close();
 }
 
 //opens a file after checking it is there.
-void bbob::bbobOpenFile(FILE* &fileId, fs::path fileName) const
+void bbob::bbobOpenFile(std::ofstream &file, fs::path fileName) const
 {
-    fileId = fopen(fileName.c_str(), "a");
-    if(fileId == NULL)
+    file.open(fileName.string(), std::ofstream::out | std::ofstream::app);
+    if(!file.is_open())
         pagmo_throw(std::runtime_error, "Could not open file");
 }
 
 void bbob::restart(std::string restart_reason) const
 {
-  FILE * rdataFileId;
-  bbobOpenFile(rdataFileId, m_rdataFilePath);
-  fprintf(rdataFileId, "%% restart: '%s'\n", restart_reason.c_str());
-  fclose(rdataFileId);
+  std::ofstream rdataFile;
+  bbobOpenFile(rdataFile, m_rdataFilePath);
+  rdataFile << boost::str(boost::format( "%% restart: '%s'\n") % restart_reason);
+  rdataFile.close();
   storeData(m_rdataFile, m_LastEval.num, m_LastEval.F, m_BestFEval.F, m_LastEval.x);
 }
 

@@ -2,7 +2,7 @@
 from PyGMO.util._util import *
 from PyGMO.util._analysis import *
 from PyGMO.util._tsp import read_tsplib
-from PyGMO.problem._problem import ackley
+
 __all__ = ['hypervolume', 'hv_algorithm', 'tsp', 'bbob']
 
 
