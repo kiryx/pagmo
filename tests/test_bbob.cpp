@@ -31,22 +31,17 @@ using namespace pagmo;
 //Test BBOB benchmarking.
 int main()
 {
-	//We instantiate the problem Schwefel with dimension 10
-	pagmo::problem::schwefel prob(10);
-	std::vector<decision_vector> bestx;
-	decision_vector x(10, 418.9828872724338);
-	bestx.push_back(x);
-	prob.set_best_x(bestx);
-	
-	for(unsigned int instance=1; instance<15; instance++)
+	//We instantiate the Ackley problem with dimension 8
+	pagmo::problem::ackley prob(8);
+	for(unsigned int instance=1; instance <= 100; instance++)
 	{
 		//We instantiate the algorithm PSO with 5000 generation
 		pagmo::algorithm::pso algo(5000);
 
 		pagmo::util::bbob benchmarking(prob, "./", "PSO", instance);
 		//1 - Evolution takes place on the same thread as main
-		//We instantiate a population containing 20 candidate solutions to the Schwefel problem
-		pagmo::population pop(benchmarking, 50, 1);
+		//We instantiate a population containing 50 candidate solutions to the Ackley problem
+		pagmo::population pop(benchmarking, 50);
 		algo.evolve(pop);
 
 		benchmarking.finalize(pop);
