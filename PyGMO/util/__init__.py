@@ -2,7 +2,7 @@
 from PyGMO.util._util import *
 from PyGMO.util._analysis import *
 from PyGMO.util._tsp import read_tsplib
-
+from PyGMO.problem._problem import ackley
 __all__ = ['hypervolume', 'hv_algorithm', 'tsp', 'bbob']
 
 
@@ -750,7 +750,7 @@ race_algo._orig_run = race_algo.run
 race_algo.run = _race_algo_run
 
 
-def _bbob_ctor(self, problem=None, datapath="./", algname="", instanceId=1):
+def _bbob_ctor(self, problem=None, datapath="./", algname="", instanceId=1, comments = ""):
     """
     Constructs a meta-problem for BBOB benchmarking.
     USAGE: bbob(problem, datapath, algname, instanceId)
@@ -761,10 +761,13 @@ def _bbob_ctor(self, problem=None, datapath="./", algname="", instanceId=1):
     * instanceId: Id of the instance
     """
     arg_list = []
+    if problem is None:
+        problem = ackley(1)
     arg_list.append(problem)
     arg_list.append(datapath)
     arg_list.append(algname)
     arg_list.append(instanceId)
+    arg_list.append(comments)
     self._orig_init(*arg_list)
 
 bbob._orig_init = bbob.__init__

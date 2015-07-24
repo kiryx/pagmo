@@ -51,7 +51,7 @@ namespace pagmo { namespace util {
 class __PAGMO_VISIBLE bbob : public problem::base_meta
 {
     public:
-        bbob(const problem::base & = problem::ackley(1), const std::string = "./", const std::string = "", const unsigned int = 1);
+        bbob(const problem::base & = problem::ackley(1), const std::string = "./", const std::string = "", const unsigned int = 1, const std::string = "");
 
         //finalize benchmarking
         void finalize(population &) const;
@@ -70,7 +70,17 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
             double bestF; //best fitness value till now
             decision_vector x; //decision vector
             int isWritten; //is it written to file?
-			
+
+            friend class boost::serialization::access;
+            template <typename Archive>
+            void serialize(Archive& ar, const unsigned int version)
+            {
+              ar & num;
+              ar & F;
+              ar & bestF;
+              ar & x;
+              ar & isWritten;
+            }
         };
 
         typedef struct lastEvalStruct LastEvalStruct;
@@ -81,6 +91,16 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
             double F;
             double bestF;
             decision_vector x;
+
+            friend class boost::serialization::access;
+            template <typename Archive>
+            void serialize(Archive& ar, const unsigned int version)
+            {
+              ar & num;
+              ar & F;
+              ar & bestF;
+              ar & x;
+            }
         };
 
         typedef struct filedata data;
@@ -96,7 +116,7 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
 
         //Helper functions
         void writeNewIndexEntry(void) const; //Create a new index file and write an index entry
-        void addDatIndexEntry(void) const; //Add index entry to existing index file with data file name
+
         void addIndexEntry(void) const; ////Add index entry to existing index file when the data file is same
         void writeFinalData(void) const; //Write Final data to log files.
         void storeBestF(std::vector<data> &, LastEvalStruct) const; //store best evaluation data to data vector at correct position.
@@ -137,6 +157,29 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
         void serialize(Archive &ar, const unsigned int)
         {
             ar & boost::serialization::base_object<base_meta>(*this);
+            ar & m_dataFile;
+            ar & m_rdataFile;
+            ar & m_hdataFile;
+            ar & m_lastEvalInit;
+            ar & m_bestF;
+            ar & m_fTrigger;
+            ar & const_cast<double &>(m_evalsTrigger);
+            ar & const_cast<unsigned int &>(m_idxEvalsTrigger);
+            ar & const_cast<unsigned int &>(m_idxDIMEvalsTrigger);
+            ar & m_idxFTrigger;
+            ar & m_LastEval;
+            ar & m_BestFEval;
+            ar & m_lastWriteEval;
+            ar & m_algName;
+            ar & m_comments;
+            ar & const_cast<double &>(m_precision);
+            ar & m_dataPath;
+            ar & m_dirPath;
+            ar & m_indexFilePath;
+            ar & m_dataFilePath;
+            ar & m_hdataFilePath;
+            ar & m_rdataFilePath;
+            ar & m_runCounter;
         }
 };
 

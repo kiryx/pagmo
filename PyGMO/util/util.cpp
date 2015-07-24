@@ -186,7 +186,7 @@ void expose_bbob()
 		.def("cpp_loads", &py_cpp_loads<util::bbob>)
 		.def("cpp_dumps", &py_cpp_dumps<util::bbob>)
 		.def("finalize", &util::bbob::finalize)
-		.def(init<pagmo::problem::base &, std::string, std::string, unsigned int>());
+		.def(init<pagmo::problem::base &, std::string, std::string, unsigned int, std::string>());
 }
 
 // Main method containing all the juice of race_pop
