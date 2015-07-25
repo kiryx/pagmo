@@ -184,6 +184,33 @@ bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std
     writeDataHeader(m_rdataFilePath);
 }
 
+//copy constructor
+bbob::bbob(const bbob &obj) : base_meta(obj),
+            m_dataFile(obj.m_dataFile),
+            m_rdataFile(obj.m_rdataFile),
+            m_hdataFile(obj.m_hdataFile),
+            m_lastEvalInit(obj.m_lastEvalInit),
+            m_bestF(obj.m_bestF),
+            m_fTrigger(obj.m_fTrigger),
+            m_evalsTrigger(obj.m_evalsTrigger),
+            m_idxEvalsTrigger(obj.m_idxEvalsTrigger),
+            m_idxDIMEvalsTrigger(obj.m_idxDIMEvalsTrigger),
+            m_idxFTrigger(obj.m_idxFTrigger),
+            m_LastEval(obj.m_LastEval),
+            m_BestFEval(obj.m_BestFEval),
+            m_lastWriteEval(obj.m_lastWriteEval),
+            m_algName(obj.m_algName),
+            m_precision(obj.m_precision),
+            m_instanceId(obj.m_instanceId),
+            m_comments(obj.m_comments),
+            m_dataPath(obj.m_dataPath),
+            m_dirPath(obj.m_dirPath),
+            m_indexFilePath(obj.m_indexFilePath),
+            m_dataFilePath(obj.m_dataFilePath),
+            m_hdataFilePath(obj.m_hdataFilePath),
+            m_rdataFilePath(obj.m_rdataFilePath),
+            m_runCounter(obj.m_runCounter) {}
+
 void bbob::objfun_impl(fitness_vector &f, const decision_vector &x) const
 {
     int i;
@@ -416,7 +443,7 @@ void bbob::restart(std::string restart_reason) const
 
 void bbob::finalize(population &pop) const
 {
-    (boost::dynamic_pointer_cast<bbob>(pagmo::population_access::get_problem_ptr(pop)))->writeFinalData();
+    (dynamic_cast<const bbob&>(pop.problem())).writeFinalData();
 }
 
 std::string bbob::get_name() const
