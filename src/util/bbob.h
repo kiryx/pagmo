@@ -56,6 +56,8 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
     public:
         bbob(const problem::base & = problem::ackley(1), const std::string = "./", const std::string = "", const unsigned int = 1, const std::string = "");
 
+        bbob(const bbob &);
+
         //finalize benchmarking
         void finalize(population &) const;
 
@@ -170,12 +172,16 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
             ar & const_cast<unsigned int &>(m_idxEvalsTrigger);
             ar & const_cast<unsigned int &>(m_idxDIMEvalsTrigger);
             ar & m_idxFTrigger;
+            ar & const_cast<double &>(m_maxFunEvalsFactor);
+            ar & const_cast<unsigned int&>(m_nbPtsEvals);
+            ar & const_cast<unsigned int &>(m_nbPtsF);
             ar & m_LastEval;
             ar & m_BestFEval;
             ar & m_lastWriteEval;
             ar & m_algName;
             ar & m_comments;
             ar & const_cast<double &>(m_precision);
+            ar & const_cast<unsigned int &>(m_instanceId);
             ar & m_dataPath;
             ar & m_dirPath;
             ar & m_indexFilePath;
