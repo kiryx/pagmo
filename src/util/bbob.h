@@ -78,7 +78,7 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
 
             friend class boost::serialization::access;
             template <typename Archive>
-            void serialize(Archive& ar, const unsigned int version)
+            void serialize(Archive& ar, const unsigned int)
             {
               ar & num;
               ar & F;
@@ -99,7 +99,7 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
 
             friend class boost::serialization::access;
             template <typename Archive>
-            void serialize(Archive& ar, const unsigned int version)
+            void serialize(Archive& ar, const unsigned int)
             {
               ar & num;
               ar & F;
