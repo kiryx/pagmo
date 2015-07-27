@@ -750,7 +750,7 @@ race_algo._orig_run = race_algo.run
 race_algo.run = _race_algo_run
 
 
-def _bbob_ctor(self, problem=None, datapath="./", algname="", instanceId=1, comments = ""):
+def _bbob_ctor(self, problem, datapath="./", algname="", instanceId=1, comments = ""):
     """
     Constructs a meta-problem for BBOB benchmarking.
     USAGE: bbob(problem, datapath, algname, instanceId)
@@ -761,8 +761,6 @@ def _bbob_ctor(self, problem=None, datapath="./", algname="", instanceId=1, comm
     * instanceId: Id of the instance
     """
     arg_list = []
-    if problem is None:
-        problem = ackley(1)
     arg_list.append(problem)
     arg_list.append(datapath)
     arg_list.append(algname)

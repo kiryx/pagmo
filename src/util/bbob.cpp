@@ -103,80 +103,87 @@ bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std
         std::string line;
         std::vector<std::string> tokens;
 
-        indexfile.open(m_indexFilePath.string());
+        indexfile.open(m_indexFilePath.string(), std::ifstream::in);
 
-        while(!indexfile.eof())
+        if(indexfile.is_open())
         {
-            //read line
-            std::getline(indexfile, line);
-
-            //skip comments
-            if(line[0] == '%')
-                continue;
-
-            //try to find "funcId = "
-            std::string pattern("funcId = ");
-            std::size_t position = line.find(pattern);
-            if(position != std::string::npos) //required line
+            while(!indexfile.eof())
             {
-                found = 0;
-                boost::split(tokens, line, boost::is_any_of(","));
+                //read line
+                std::getline(indexfile, line);
+                
+                //skip comments
+                if(line[0] == '%')
+                    continue;
 
-                for(int i = 0; i < tokens.size(); i++)
+                //try to find "funcId = "
+                std::string pattern("funcId = ");
+                std::size_t position = line.find(pattern);
+                if(position != std::string::npos) //required line
                 {
-                    //get dimensions
-                    pattern = "DIM = ";
-                    position = tokens[i].find(pattern);
-                    if(position != std::string::npos)
+                    found = 0;
+                    boost::split(tokens, line, boost::is_any_of(","));
+
+                    for(int i = 0; i < tokens.size(); i++)
                     {
-                        position += pattern.length();
-                        std::istringstream ss(tokens[i].substr(position));
-                        ss >> old_dim;
+                        //get dimensions
+                        pattern = "DIM = ";
+                        position = tokens[i].find(pattern);
+                        if(position != std::string::npos)
+                        {
+                            position += pattern.length();
+                            std::istringstream ss(tokens[i].substr(position));
+                            ss >> old_dim;
 
-                        if(old_dim == p.get_dimension())
-                            found++;
+                            if(old_dim == p.get_dimension())
+                                ++found;
+                        }
+
+                        //get precision
+                        pattern = "Precision = ";
+                        position = tokens[i].find(pattern);
+                        if(position != std::string::npos)
+                        {
+                            position += pattern.length();
+                            std::istringstream ss(tokens[i].substr(position));
+                            ss >> old_precision;
+
+                            if(fabs(old_precision - m_precision) < 1e-10)
+                                ++found;
+                        }
+
+                        //get algorithm name
+                        pattern = "algId = '";
+                        position = tokens[i].find(pattern);
+                        if(position != std::string::npos)
+                        {
+                            position += pattern.length();
+                            old_algname = tokens[i].substr(position, tokens[i].length() - position - 1); //remove '
+
+                            if(old_algname.compare(algname) == 0)
+                                ++found;
+                        }
                     }
+                    if(!indexfile.eof())
+                    {    
+                        //compare comments
+                        std::getline(indexfile, line);
 
-                    //get precision
-                    pattern = "Precision = ";
-                    position = tokens[i].find(pattern);
-                    if(position != std::string::npos)
-                    {
-                        position += pattern.length();
-                        std::istringstream ss(tokens[i].substr(position));
-                        ss >> old_precision;
-
-                        if(fabs(old_precision - m_precision) < 1e-10)
-                            found++;
+                        //exclude %
+                        if(m_comments.compare(line.substr(1, line.length() - 2)) == 0)
+                            ++found;
                     }
-
-                    //get algorithm name
-                    pattern = "algId = '";
-                    position = tokens[i].find(pattern);
-                    if(position != std::string::npos)
-                    {
-                        position += pattern.length();
-                        old_algname = tokens[i].substr(position, tokens[i].length() - position - 1); //remove '
-
-                        if(old_algname.compare(algname) == 0)
-                            found++;
-                    }
-
-                    //compare comments
-                    std::getline(indexfile, line);
-
-                    //skip %
-                    if(m_comments.compare(line.substr(1, line.length() - 2)) == 0)
-                        found++;
                 }
             }
-        }
-        indexfile.close();
-        if(found == 4) //if all parameters are same for the last run
-            addIndexEntry();
+            indexfile.close();
+            if(found == 4) //if all parameters are same for the last run
+                addIndexEntry();
 
-        else //Parameters changed
-            writeNewIndexEntry();
+            else //Parameters changed
+                writeNewIndexEntry();
+        }
+        else
+            pagmo_throw(std::runtime_error, "Could not open index file");
     }
 
     writeDataHeader(m_dataFilePath);
@@ -200,9 +207,9 @@ bbob::bbob(const bbob &obj) : base_meta(obj),
             m_BestFEval(obj.m_BestFEval),
             m_lastWriteEval(obj.m_lastWriteEval),
             m_algName(obj.m_algName),
+            m_comments(obj.m_comments),
             m_precision(obj.m_precision),
             m_instanceId(obj.m_instanceId),
-            m_comments(obj.m_comments),
             m_dataPath(obj.m_dataPath),
             m_dirPath(obj.m_dirPath),
             m_indexFilePath(obj.m_indexFilePath),
@@ -213,7 +220,6 @@ bbob::bbob(const bbob &obj) : base_meta(obj),
 
 void bbob::objfun_impl(fitness_vector &f, const decision_vector &x) const
 {
-    int i;
     unsigned int boolImprovement = 0;
     double Fvalue;
     double evalsj;
@@ -384,7 +390,7 @@ void bbob::storeBestF(std::vector<data> &dataFile, LastEvalStruct BestFEval) con
     best.bestF = BestFEval.F;
     best.x = BestFEval.x;
 
-    for(int j=0; j<dataFile.size(); j++)
+    for(std::vector<data>::size_type j=0; j<dataFile.size(); j++)
     {
         if(dataFile[j].num > BestFEval.num)
             temp.push_back(best);
@@ -413,11 +419,11 @@ void bbob::writeData(fs::path file, std::vector<data> &vec) const
     std::ofstream fout;
     bbobOpenFile(fout, file);
 
-    for(int i=0; i<vec.size(); i++)
+    for(std::vector<data>::size_type i=0; i<vec.size(); i++)
     {
         fout << boost::str(boost::format("%.0f %+10.9e %+10.9e %+10.9e %+10.9e") % vec[i].num % (vec[i].F-m_bestF) % (vec[i].bestF-m_bestF) % (vec[i].F) % vec[i].bestF);
         if(vec[i].x.size() < 22)
-            for(int j=0; j<vec[i].x.size(); j++)
+            for(decision_vector::size_type j=0; j<vec[i].x.size(); j++)
                 fout << boost::str(boost::format(" %+5.4e") % vec[i].x[j]);
         fout << "\n";
     }
