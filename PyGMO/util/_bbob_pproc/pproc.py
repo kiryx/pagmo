@@ -1337,11 +1337,10 @@ class DataSetList(list):
         else:
             print self
 
-    def sort(self, key1='dim', key2='funcId'):
+    def sort(self, key1='dim'):
         def cmp_fun(a, b):
             if getattr(a, key1) == getattr(b, key1):
-                if getattr(a, key2) == getattr(b, key2):
-                    return 0            
+                return 0           
             else:
                 return 1 if getattr(a, key1) > getattr(b, key1) else -1
         sorted_self = list(sorted(self, cmp=cmp_fun))
