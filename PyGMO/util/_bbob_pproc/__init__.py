@@ -25,8 +25,8 @@ from __future__ import absolute_import
 import sys
 
 from PyGMO.util._bbob_pproc.cococommands import *
-from PyGMO.util._bbob_pproc import pprldistr
+from PyGMO.util._bbob_pproc import pprldistr, ppfigdim
 
-__all__  = ['pprldistr', 'pproc', 'ppfig']
+__all__  = ['pprldistr', 'pproc', 'ppfig', 'ppfigdim']
 
 __version__ = '15.00'
