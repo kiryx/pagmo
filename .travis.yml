@@ -27,6 +27,9 @@ before_install:
   - tar -xjf cmake.tar.bz2
   - rm cmake.tar.bz2
   - export PATH=$(pwd)/cmake/bin:$PATH
+  - sudo apt-get install python-pip
+  - sudo pip install numpy
+  - sudo pip install matplotlib
 
 install:
   # Get boost
