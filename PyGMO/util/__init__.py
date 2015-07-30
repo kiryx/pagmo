@@ -2,6 +2,7 @@
 from PyGMO.util._util import *
 from PyGMO.util._analysis import *
 from PyGMO.util._tsp import read_tsplib
+
 from PyGMO.util import coco
 
 __all__ = ['hypervolume', 'hv_algorithm', 'tsp', 'coco']
