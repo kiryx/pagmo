@@ -28,10 +28,10 @@ import warnings
 from pdb import set_trace
 import numpy, numpy as np
 import matplotlib.pyplot as plt
-from PyGMO.util._bbob_pproc import genericsettings, findfiles, toolsstats, toolsdivers
-from PyGMO.util._bbob_pproc import genericsettings as gs
-from PyGMO.util._bbob_pproc.readalign import split, alignData, HMultiReader, VMultiReader
-from PyGMO.util._bbob_pproc.readalign import HArrayMultiReader, VArrayMultiReader, alignArrayData
+from PyGMO.util.coco.postproc import genericsettings, findfiles, toolsstats, toolsdivers
+from PyGMO.util.coco.postproc import genericsettings as gs
+from PyGMO.util.coco.postproc.readalign import split, alignData, HMultiReader, VMultiReader
+from PyGMO.util.coco.postproc.readalign import HArrayMultiReader, VArrayMultiReader, alignArrayData
 
 do_assertion = genericsettings.force_assertions # expensive assertions
 targets_displayed_for_info = [10, 1., 1e-1, 1e-3, 1e-5, 1e-8]  # only to display info in DataSetList.info
@@ -77,13 +77,13 @@ def _DataSet_complement_data(self, step=10**0.2, final_target=1e-8):
     self._is_complemented_data = True # TODO: will remain true forever, this needs to be set to False again somewhere? 
 
 def cocofy(filename):
-    """Replaces PyGMO.util._bbob_pproc references in pickles files with coco_pproc
+    """Replaces PyGMO.util.coco.postproc references in pickles files with coco_pproc
         This could become necessary for future backwards compatibility,
         however rather should become a class method. """
     import fileinput
     for line in fileinput.input(filename, inplace=1):
 #       if "bbob" in line:
-        sys.stdout.write(line.replace("PyGMO.util._bbob_pproc","coco_pproc"))
+        sys.stdout.write(line.replace("PyGMO.util.coco.postproc","coco_pproc"))
     fileinput.close
 
 # CLASS DEFINITIONS
@@ -92,7 +92,7 @@ class TargetValues(object):
     """store and retrieve a list of target function values::
 
         >>> import numpy as np
-        >>> import PyGMO.util._bbob_pproc.pproc as pp
+        >>> import PyGMO.util.coco.postproc.pproc as pp
         >>> targets = [10**i for i in np.arange(2, -8.1, -0.2)]
         >>> targets_as_class = pp.TargetValues(targets)
         >>> assert all(targets_as_class() == targets)
@@ -219,7 +219,7 @@ class DataSet():
         >>> import sys
         >>> import os
         >>> os.chdir(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
-        >>> import PyGMO.util._bbob_pproc as bb
+        >>> import PyGMO.util.coco.postproc as bb
         >>> dslist = bb.load('BIPOP-CMA-ES_hansen_noiseless/bbobexp_f2.info')
         >>> dslist  # nice display in particular in IPython
         [DataSet(cmaes V3.30.beta on f2 2-D),
@@ -229,7 +229,7 @@ class DataSet():
          DataSet(cmaes V3.30.beta on f2 20-D),
          DataSet(cmaes V3.30.beta on f2 40-D)]
         >>> type(dslist)
-        <class 'PyGMO.util._bbob_pproc.pproc.DataSetList'>
+        <class 'PyGMO.util.coco.postproc.pproc.DataSetList'>
         >>> len(dslist)
         6
         >>> ds = dslist[3]  # a single data set of type DataSet

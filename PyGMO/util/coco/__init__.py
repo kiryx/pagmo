@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyGMO.util.coco._benchmark import *
+from PyGMO.util.coco import postproc
 
-__all__ = ['benchmark']
+__all__ = ['benchmark', 'postproc']
 
 def _benchmark_ctor(self, problem, datapath="./", algname="", instanceId=1, comments = ""):
     """

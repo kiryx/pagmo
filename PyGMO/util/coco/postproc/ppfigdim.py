@@ -29,7 +29,7 @@ grid lines show quadratic and cubic scaling.
     
     from pylab import *
     
-    import PyGMO.util._bbob_pproc as bb
+    import PyGMO.util.coco.postproc as bb
     
     # Scaling figure
     ds = bb.load('<path to folder with data>')
@@ -43,8 +43,8 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from pdb import set_trace
-from PyGMO.util._bbob_pproc import genericsettings, toolsstats, pproc
-from PyGMO.util._bbob_pproc.ppfig import saveFigure, groupByRange
+from PyGMO.util.coco.postproc import genericsettings, toolsstats, pproc
+from PyGMO.util.coco.postproc.ppfig import saveFigure, groupByRange
 
 values_of_interest = pproc.TargetValues((10, 1, 1e-1, 1e-2, 1e-3, 1e-5, 1e-8))  # to rename!?
 xlim_max = None

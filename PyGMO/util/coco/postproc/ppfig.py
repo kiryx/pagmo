@@ -8,7 +8,7 @@ import warnings
 import numpy as np
 from matplotlib import pyplot as plt
 from pdb import set_trace
-from PyGMO.util._bbob_pproc import genericsettings, toolsstats
+from PyGMO.util.coco.postproc import genericsettings, toolsstats
 
 def saveFigure(filename, figFormat=genericsettings.fig_formats, verbose=True):
     """Save figure into an image file."""
@@ -179,7 +179,7 @@ def consecutiveNumbers(data):
       >>> import sys
       >>> import os
       >>> os.chdir(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
-      >>> import PyGMO.util._bbob_pproc as bb
+      >>> import PyGMO.util.coco.postproc as bb
       >>> bb.ppfig.consecutiveNumbers([0, 1, 2, 4, 5, 7, 8, 9])
       '0-2, 4, 5, 7-9'
 
