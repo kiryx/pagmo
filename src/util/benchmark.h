@@ -22,8 +22,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.               *
  *****************************************************************************/
 
-#ifndef PAGMO_UTIL_BBOB_H
-#define PAGMO_UTIL_BBOB_H
+#ifndef PAGMO_UTIL_COCO_BENCHMARK_H
+#define PAGMO_UTIL_COCO_BENCHMARK_H
 
 #include <iostream>
 #include <string>
@@ -45,23 +45,23 @@
 
 namespace fs = boost::filesystem;
 
-namespace pagmo { namespace util {
+namespace pagmo { namespace util { namespace coco {
 
 /**
- * This class creates the meta problem for Black-Box Optimization Benchmarking (BBOB2015) which
- * has to be optimized.
+ * This class creates the meta problem for COmparing Continuous Optimisers (COCO) module which
+ * has to be optimized for benchmarking any pagmo::problem
  */
-class __PAGMO_VISIBLE bbob : public problem::base_meta
+class __PAGMO_VISIBLE benchmark : public pagmo::problem::base_meta
 {
     public:
-        bbob(const problem::base & = problem::ackley(1), const std::string = "./", const std::string = "", const unsigned int = 1, const std::string = "");
+        benchmark(const pagmo::problem::base & = pagmo::problem::ackley(1), const std::string = "./", const std::string = "", const unsigned int = 1, const std::string = "");
 
-        bbob(const bbob &);
+        benchmark(const benchmark &);
 
         //finalize benchmarking
         void finalize(population &) const;
 
-        problem::base_ptr clone() const;
+        pagmo::problem::base_ptr clone() const;
         std::string get_name() const;
 
     protected:
@@ -127,7 +127,7 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
         void storeBestF(std::vector<data> &, LastEvalStruct) const; //store best evaluation data to data vector at correct position.
         void storeData(std::vector<data> &, double, double, double, decision_vector) const; //Store data to be written to files in data vectors.
         void writeDataHeader(fs::path) const; //Write headers to files.
-        void bbobOpenFile(std::ofstream &, fs::path) const; //Open file and return fileId
+        void benchmarkOpenFile(std::ofstream &, fs::path) const; //Open file and return fileId
         void writeData(fs::path, std::vector<data> &) const; //Write data from vectors to data files.
         void restart(std::string) const; //write to restart log.
 
@@ -192,8 +192,8 @@ class __PAGMO_VISIBLE bbob : public problem::base_meta
         }
 };
 
-}}
+}}}
 
-BOOST_CLASS_EXPORT_KEY(pagmo::util::bbob)
+BOOST_CLASS_EXPORT_KEY(pagmo::util::coco::benchmark)
 
 #endif

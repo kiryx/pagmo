@@ -43,7 +43,7 @@ int main()
 		//We instantiate the algorithm PSO with 5000 generation
 		pagmo::algorithm::pso algo(5000);
 
-		pagmo::util::bbob benchmarking(prob, "./", "PSO", instance);
+		pagmo::util::coco::benchmark benchmarking(prob, "./", "PSO", instance);
 		//1 - Evolution takes place on the same thread as main
 		//We instantiate a population containing 20 candidate solutions to the Schwefel problem
 		pagmo::population pop(benchmarking, 50, 1);

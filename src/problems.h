@@ -81,7 +81,7 @@
 #include "problem/robust.h"
 #include "problem/con2uncon.h"
 #include "problem/bbob2015.h"
-#include "util/bbob.h"
+#include "util/benchmark.h"
 
 // GSL problems.
 #ifdef PAGMO_ENABLE_GSL
