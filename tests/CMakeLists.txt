@@ -58,9 +58,9 @@ ADD_EXECUTABLE(test_decompose test_decompose.cpp)
 TARGET_LINK_LIBRARIES(test_decompose ${MANDATORY_LIBRARIES} pagmo_static)
 ADD_TEST(test_decompose test_decompose)
 
-ADD_EXECUTABLE(test_bbob test_bbob.cpp)
-TARGET_LINK_LIBRARIES(test_bbob ${MANDATORY_LIBRARIES} pagmo_static)
-ADD_TEST(test_bbob test_bbob)
+ADD_EXECUTABLE(test_benchmark test_benchmark.cpp)
+TARGET_LINK_LIBRARIES(test_benchmark ${MANDATORY_LIBRARIES} pagmo_static)
+ADD_TEST(test_benchmark test_benchmark)
 
 IF(ENABLE_MPI)
 	ADD_EXECUTABLE(mpi_torture_test mpi_torture_test.cpp)

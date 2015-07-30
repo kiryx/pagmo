@@ -22,11 +22,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.               *
  *****************************************************************************/
 
-#include "bbob.h"
+#include "benchmark.h"
 
-namespace pagmo { namespace util {
+namespace pagmo { namespace util { namespace coco {
 
-bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std::string algname, unsigned int instanceId, std::string comments) : problem::base_meta(p,
+benchmark::benchmark(const pagmo::problem::base & p, const std::string datapath, 
+                        const std::string algname, unsigned int instanceId, std::string comments) : pagmo::problem::base_meta(p,
                                 p.get_dimension(), // Ambiguous without the cast ...
                                 p.get_i_dimension(),
                                 1, //We can only benchmark using single objective functions.
@@ -193,7 +194,7 @@ bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std
 }
 
 //copy constructor
-bbob::bbob(const bbob &obj) : base_meta(obj),
+benchmark::benchmark(const benchmark &obj) : base_meta(obj),
             m_dataFile(obj.m_dataFile),
             m_rdataFile(obj.m_rdataFile),
             m_hdataFile(obj.m_hdataFile),
@@ -219,7 +220,7 @@ bbob::bbob(const bbob &obj) : base_meta(obj),
             m_rdataFilePath(obj.m_rdataFilePath),
             m_runCounter(obj.m_runCounter) {}
 
-void bbob::objfun_impl(fitness_vector &f, const decision_vector &x) const
+void benchmark::objfun_impl(fitness_vector &f, const decision_vector &x) const
 {
     unsigned int boolImprovement = 0;
     double Fvalue;
@@ -303,10 +304,10 @@ void bbob::objfun_impl(fitness_vector &f, const decision_vector &x) const
 //Subfunctions
 
 //write the comment line header in the data files
-void bbob::writeDataHeader(fs::path dataFilePath) const
+void benchmark::writeDataHeader(fs::path dataFilePath) const
 {
     std::ofstream dataFile;
-    bbobOpenFile(dataFile, dataFilePath);
+    benchmarkOpenFile(dataFile, dataFilePath);
 
     dataFile << boost::str(boost::format("%% function evaluation | fitness - Fopt (%13.12e) | best fitness - Fopt | measured fitness | best measured fitness | x1 | x2...\n")
         % m_bestF);
@@ -314,14 +315,14 @@ void bbob::writeDataHeader(fs::path dataFilePath) const
 }
 
 //open the index file and write a new index entry
-void bbob::writeNewIndexEntry(void) const
+void benchmark::writeNewIndexEntry(void) const
 {
     std::ofstream indexFile;
     int newline = 1;
     if(!fs::is_regular_file(m_indexFilePath))
         newline = 0;
 
-    bbobOpenFile(indexFile, m_indexFilePath);
+    benchmarkOpenFile(indexFile, m_indexFilePath);
 
     if(newline == 1)
         indexFile <<"\n";
@@ -334,21 +335,21 @@ void bbob::writeNewIndexEntry(void) const
 }
 
 //Open the index file and write a new index entry */
-void bbob::addIndexEntry(void) const
+void benchmark::addIndexEntry(void) const
 {
     std::ofstream indexFile;
 
     if (!fs::is_regular_file(m_indexFilePath))
         pagmo_throw(std::runtime_error, "Could not find index file");
 
-    bbobOpenFile(indexFile, m_indexFilePath);
+    benchmarkOpenFile(indexFile, m_indexFilePath);
 
     indexFile << boost::str(boost::format(", %d") % m_instanceId);
     indexFile.close();
 }
 
 //complete the data file with unwritten information
-void bbob::writeFinalData(void) const
+void benchmark::writeFinalData(void) const
 {
     std::ofstream indexFile;
 
@@ -368,7 +369,7 @@ void bbob::writeFinalData(void) const
         storeData(m_dataFile, m_LastEval.num, m_LastEval.F, m_BestFEval.F, m_LastEval.x);
 
     //now the index file
-    bbobOpenFile(indexFile, m_indexFilePath);
+    benchmarkOpenFile(indexFile, m_indexFilePath);
     indexFile << boost::str(boost::format(":%.0f|%.1e") % m_LastEval.num % (m_BestFEval.F - m_bestF - m_precision));
     indexFile.close();
 
@@ -379,7 +380,7 @@ void bbob::writeFinalData(void) const
 }
 
 //rewrite the data file with the information about the best F.
-void bbob::storeBestF(std::vector<data> &dataFile, LastEvalStruct BestFEval) const
+void benchmark::storeBestF(std::vector<data> &dataFile, LastEvalStruct BestFEval) const
 {
     //insert the evaluation at the correct position
     std::vector<data> temp;
@@ -403,7 +404,7 @@ void bbob::storeBestF(std::vector<data> &dataFile, LastEvalStruct BestFEval) con
 }
 
 //write a formatted line into a data file
-void bbob::storeData(std::vector<data> &vec, double evals, double F, double bestF, decision_vector x) const
+void benchmark::storeData(std::vector<data> &vec, double evals, double F, double bestF, decision_vector x) const
 {
     data temp;
     temp.num = evals;
@@ -415,10 +416,10 @@ void bbob::storeData(std::vector<data> &vec, double evals, double F, double best
 }
 
 //write a formatted line into a data file
-void bbob::writeData(fs::path file, std::vector<data> &vec) const
+void benchmark::writeData(fs::path file, std::vector<data> &vec) const
 {
     std::ofstream fout;
-    bbobOpenFile(fout, file);
+    benchmarkOpenFile(fout, file);
 
     for(std::vector<data>::size_type i=0; i<vec.size(); i++)
     {
@@ -432,40 +433,40 @@ void bbob::writeData(fs::path file, std::vector<data> &vec) const
 }
 
 //opens a file after checking it is there.
-void bbob::bbobOpenFile(std::ofstream &file, fs::path fileName) const
+void benchmark::benchmarkOpenFile(std::ofstream &file, fs::path fileName) const
 {
     file.open(fileName.string(), std::ofstream::out | std::ofstream::app);
     if(!file.is_open())
         pagmo_throw(std::runtime_error, "Could not open file");
 }
 
-void bbob::restart(std::string restart_reason) const
+void benchmark::restart(std::string restart_reason) const
 {
   std::ofstream rdataFile;
-  bbobOpenFile(rdataFile, m_rdataFilePath);
+  benchmarkOpenFile(rdataFile, m_rdataFilePath);
   rdataFile << boost::str(boost::format( "%% restart: '%s'\n") % restart_reason);
   rdataFile.close();
   storeData(m_rdataFile, m_LastEval.num, m_LastEval.F, m_BestFEval.F, m_LastEval.x);
 }
 
-void bbob::finalize(population &pop) const
+void benchmark::finalize(population &pop) const
 {
-    (dynamic_cast<const bbob&>(pop.problem())).writeFinalData();
+    (dynamic_cast<const benchmark&>(pop.problem())).writeFinalData();
 }
 
-std::string bbob::get_name() const
+std::string benchmark::get_name() const
 {
-    std::string retval("BBOB benchmarking - ");
+    std::string retval("benchmark benchmarking - ");
     retval.append(m_original_problem->get_name());
 
     return retval;
 }
 
-problem::base_ptr bbob::clone() const
+pagmo::problem::base_ptr benchmark::clone() const
 {
-    return problem::base_ptr(new bbob(*this));
+    return pagmo::problem::base_ptr(new benchmark(*this));
 }
 
-}} //namespace
+}}} //namespace
 
-BOOST_CLASS_EXPORT_IMPLEMENT(pagmo::util::bbob)
+BOOST_CLASS_EXPORT_IMPLEMENT(pagmo::util::coco::benchmark)
