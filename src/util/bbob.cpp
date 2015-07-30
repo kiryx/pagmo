@@ -32,9 +32,10 @@ bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std
                                 1, //We can only benchmark using single objective functions.
                                 p.get_c_dimension(),
                                 p.get_ic_dimension(),
-                                p.get_c_tol()), m_algName(algname),
-                                m_instanceId(instanceId),
-                                m_comments(comments)
+                                p.get_c_tol()), 
+                                m_algName(algname),
+                                m_comments(comments),
+                                m_instanceId(instanceId)
 {
     std::vector<fitness_vector> bestf = p.get_best_f();
 
@@ -124,7 +125,7 @@ bbob::bbob(const pagmo::problem::base & p, const std::string datapath, const std
                     found = 0;
                     boost::split(tokens, line, boost::is_any_of(","));
 
-                    for(int i = 0; i < tokens.size(); i++)
+                    for(std::vector<std::string>::size_type i = 0; i < tokens.size(); i++)
                     {
                         //get dimensions
                         pattern = "DIM = ";
