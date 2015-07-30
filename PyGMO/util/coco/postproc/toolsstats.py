@@ -5,7 +5,7 @@
 
 import warnings
 import numpy as np
-from PyGMO.util._bbob_pproc import genericsettings
+from PyGMO.util.coco.postproc import genericsettings
 from pdb import set_trace
 
 
@@ -18,7 +18,7 @@ def fix_data_number(data, ndata=15,
 
     :param data: is a (row)-vector
 
-    >>> from PyGMO.util._bbob_pproc.toolsstats import fix_data_number
+    >>> from PyGMO.util.coco.postproc.toolsstats import fix_data_number
     >>> data = [1,2,4]
     >>> assert len(fix_data_number(data, 1)) == 1
     >>> assert len(fix_data_number(data, 3)) == 3

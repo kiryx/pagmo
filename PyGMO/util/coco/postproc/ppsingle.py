@@ -5,7 +5,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from PyGMO.util._bbob_pproc import toolsstats
+from PyGMO.util.coco.postproc import toolsstats
 from pdb import set_trace
 
 lineprops = ('color', 'linestyle', 'linewidth', 'marker', 'markeredgecolor',

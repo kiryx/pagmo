@@ -10,13 +10,13 @@ line of the examples below.
 The main data structures used in COCO are :py:class:`DataSet`, which
 corresponds to data of one algorithm on one problem, and
 :py:class:`DataSetList`, which is for collections of :py:class:`DataSet`
-instances. Both classes are implemented in :py:mod:`PyGMO.util._bbob_pproc.pproc`.
+instances. Both classes are implemented in :py:mod:`PyGMO.util.coco.postproc.pproc`.
 
 Examples:
 
-* Start by importing :py:mod:`PyGMO.util._bbob_pproc`::
+* Start by importing :py:mod:`PyGMO.util.coco.postproc`::
 
-    >>> import PyGMO.util._bbob_pproc as bb # load PyGMO.util._bbob_pproc
+    >>> import PyGMO.util.coco.postproc as bb # load PyGMO.util.coco.postproc
     >>> import os
     >>> os.chdir(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 
@@ -47,9 +47,9 @@ Examples:
 
 from __future__ import absolute_import
 
-#from PyGMO.util._bbob_pproc import ppsingle, ppfigdim, dataoutput
-# from PyGMO.util._bbob_pproc.pproc import DataSetList, DataSet
-from PyGMO.util._bbob_pproc import pproc
+#from PyGMO.util.coco.postproc import ppsingle, ppfigdim, dataoutput
+# from PyGMO.util.coco.postproc.pproc import DataSetList, DataSet
+from PyGMO.util.coco.postproc import pproc
 
 #__all__ = ['load', 'info', 'pickle', 'systeminfo', 'DataSetList', 'DataSet']
 
@@ -85,5 +85,5 @@ def systeminfo():
     print 'Numpy %s' % numpy.__version__
     import matplotlib
     print 'Matplotlib %s' % matplotlib.__version__
-    import PyGMO.util._bbob_pproc
-    print 'PyGMO.util._bbob_pproc %s' % PyGMO.util._bbob_pproc.__version__
+    import PyGMO.util.coco.postproc
+    print 'PyGMO.util.coco.postproc %s' % PyGMO.util.coco.postproc.__version__

@@ -10,7 +10,7 @@ The post-processing tool takes as input data from experiments and
 generates outputs that will be used in the generation of the LateX-
 formatted article summarizing the experiments.
 
-The main method of this package is :py:func:`PyGMO.util._bbob_pproc.rungeneric.main`
+The main method of this package is :py:func:`PyGMO.util.coco.postproc.rungeneric.main`
 This method allows to use the post-processing through a command-line
 interface.
 
@@ -24,8 +24,8 @@ from __future__ import absolute_import
 
 import sys
 
-from PyGMO.util._bbob_pproc.cococommands import *
-from PyGMO.util._bbob_pproc import pprldistr, ppfigdim, ppsingle, ppfigparam
+from PyGMO.util.coco.postproc.cococommands import *
+from PyGMO.util.coco.postproc import pprldistr, ppfigdim, ppsingle, ppfigparam
 
 __all__  = ['pprldistr', 'pproc', 'ppfig', 'ppfigdim', 'ppsingle', 'ppfigparam']
 

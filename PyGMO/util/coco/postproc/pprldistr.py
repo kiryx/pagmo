@@ -12,7 +12,7 @@ the running times of trials.
    :width: 75%
 
    from pylab import *
-   import PyGMO.util._bbob_pproc as bb
+   import PyGMO.util.coco.postproc as bb
 
    # Empirical cumulative distribution function figure
    ds = bb.load('<path to folder with test data>')
@@ -32,8 +32,8 @@ import numpy as np
 import pickle, gzip
 import matplotlib.pyplot as plt
 from pdb import set_trace
-from PyGMO.util._bbob_pproc import toolsstats, genericsettings, pproc
-from PyGMO.util._bbob_pproc.ppfig import consecutiveNumbers, plotUnifLogXMarkers, saveFigure, logxticks
+from PyGMO.util.coco.postproc import toolsstats, genericsettings, pproc
+from PyGMO.util.coco.postproc.ppfig import consecutiveNumbers, plotUnifLogXMarkers, saveFigure, logxticks
 
 single_target_values = pproc.TargetValues((10., 1e-1, 1e-4, 1e-8)) # possibly changed in config
 single_runlength_factors = [0.5, 1.2, 3, 10] + [10 ** i for i in range(2, 12)]

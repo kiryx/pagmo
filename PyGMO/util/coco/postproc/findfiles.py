@@ -6,7 +6,7 @@
 This module can be called from the shell, it will recursively look for
 :file:`info` and :file:`pickle` files in the current working directory::
 
-  $ python pathtococo/PyGMO.util._bbob_pproc/findfiles.py
+  $ python pathtococo/PyGMO.util.coco.postproc/findfiles.py
   Searching in ...
   Found ... file(s)!
 
