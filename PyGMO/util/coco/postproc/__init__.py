@@ -25,8 +25,8 @@ from __future__ import absolute_import
 import sys
 
 from PyGMO.util.coco.postproc.cococommands import *
-from PyGMO.util.coco.postproc import pprldistr, ppfigdim, ppsingle, ppfigparam
+from PyGMO.util.coco.postproc import pprldistr, ppfigdim, ppsingle, ppfigparam, ppfig2, pprldistr2, ppscatter
 
-__all__  = ['pprldistr', 'pproc', 'ppfig', 'ppfigdim', 'ppsingle', 'ppfigparam']
+__all__  = ['pprldistr', 'pproc', 'ppfig', 'ppfigdim', 'ppsingle', 'ppfigparam', 'ppfig2', 'pprldistr2', 'ppscatter']
 
 __version__ = '15.00'
