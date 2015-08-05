@@ -1289,7 +1289,7 @@ class DataSetList(list):
             algs.sort()
             sys.stdout.write('Algorithm(s): %s' % (algs[0][0]))
             for i in range(1, len(algs)):
-                sys.stdout.write(', %s' % (algs[0][0]))
+                sys.stdout.write(', %s' % (algs[i][0]))
             sys.stdout.write('\n')
 
             dictFun = self.dictByFunc()

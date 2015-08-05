@@ -3,7 +3,7 @@
 
 """Creates ERT-ratio comparison figures (ECDF) and convergence figures for the comparison of 2 algorithms.
 
-Scale up figures for two algorithms can be done with compall/ppfigs.py
+Scale up figures for two algorithms can be done with ppfigs.py
 
 """
 
@@ -22,7 +22,7 @@ except ImportError:
 
 import numpy as np 
 
-from PyGMO.util.coco.postproc import toolsstats, readalign, pproc
+from PyGMO.util.coco.postproc import toolsstats, readalign, pproc, genericsettings
 from PyGMO.util.coco.postproc.toolsstats import ranksumtest
 from PyGMO.util.coco.postproc.ppfig import saveFigure, plotUnifLogXMarkers
 #try:
@@ -33,24 +33,7 @@ from PyGMO.util.coco.postproc.ppfig import saveFigure, plotUnifLogXMarkers
     #pass
 
 
-styles = [{'color': 'c', 'marker': '+', 'markeredgecolor': 'c',
-           'markerfacecolor': 'None'},
-          {'color': 'g', 'marker': 'v', 'markeredgecolor': 'g',
-           'markerfacecolor': 'None'},
-          {'color': 'b', 'marker': '*', 'markeredgecolor': 'b',
-           'markerfacecolor': 'None'},
-          {'color': 'k', 'marker': 'o', 'markeredgecolor': 'k',
-           'markerfacecolor': 'None'},
-          {'color': 'r', 'marker': 's', 'markeredgecolor': 'r',
-           'markerfacecolor': 'None'},
-          {'color': 'm', 'marker': 'D', 'markeredgecolor': 'm',
-           'markerfacecolor': 'None'},
-          {'color': 'k'},
-          {'color': 'y'},
-          {'color': 'k'},
-          {'color': 'c'},
-          {'color': 'r'},
-          {'color': 'm'}]
+styles = genericsettings.line_styles
 linewidth = 1
 offset = 0.005
 incrstars = 1.5
