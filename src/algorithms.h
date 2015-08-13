@@ -60,6 +60,7 @@
 #include "algorithm/spea2.h"
 #include "algorithm/inverover.h"
 #include "algorithm/nn_tsp.h"
+#include "algorithm/bat.h"
 
 // Hyper-heuristics
 #include "algorithm/mbh.h"

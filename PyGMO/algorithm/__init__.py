@@ -413,6 +413,42 @@ _algorithm.sga.crossover = _algorithm._sga_crossover_type
 _algorithm.sga.selection = _algorithm._sga_selection_type
 _algorithm.sga.mutation = _algorithm._sga_mutation_type
 
+def _bat_ctor(
+        self,
+        gen=1,
+        qmax=1,
+        qmin=0,
+        alpha=0.9,
+        gam=0.9,
+        loudness=0.5,
+        pulserate=0.5):
+    """
+    Constructs a Bat Algorithm. The position update is applied
+    immediately after the velocity update
+    USAGE: algorithm.bat(gen=1, qmax=1, qmin=0, alpha=0.9, gam=0.9, loudness=0.5, pulserate=0.5)
+
+    * gen: number of generations
+    * qmax: maximum frequency
+    * qmin: minimum frequency
+    * alpha: rate of decrease in loudness
+    * gam: rate of increase in pulse rate
+    * loudness: initial loudness of all bats
+    * pulserate: initial pulse rate of all bats
+    """
+    # We set the defaults or the kwargs
+    arg_list = []
+    arg_list.append(gen)
+    arg_list.append(qmax)
+    arg_list.append(qmin)
+    arg_list.append(alpha)
+    arg_list.append(gam)
+    arg_list.append(loudness)
+    arg_list.append(pulserate)
+    self._orig_init(*arg_list)
+
+bat._orig_init = bat.__init__
+bat.__init__ = _bat_ctor
+
 
 def _sga_ctor(
         self,
