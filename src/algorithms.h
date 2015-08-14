@@ -61,6 +61,7 @@
 #include "algorithm/inverover.h"
 #include "algorithm/nn_tsp.h"
 #include "algorithm/bat.h"
+#include "algorithm/cuckoosearch.h"
 
 // Hyper-heuristics
 #include "algorithm/mbh.h"

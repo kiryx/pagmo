@@ -332,6 +332,10 @@ BOOST_PYTHON_MODULE(_algorithm) {
 	algorithm_wrapper<algorithm::bat>("bat", "Bat Algorithm")
 		.def(init<optional<int, double, double, double, double, double, double> >());
 	
+    // Cuckoo Search Algorithm
+	algorithm_wrapper<algorithm::cuckoosearch>("cuckoosearch", "Cuckoo Search Algorithm")
+		.def(init<optional<int, double> >());
+	
 	// Simple Genetic Algorithm.
 	algorithm_wrapper<algorithm::sga>("sga", "A simple genetic algorithm (generational)")
 		.def(init<int, optional<const double &, const double &, int, algorithm::sga::mutation::type, double, algorithm::sga::selection::type, algorithm::sga::crossover::type> >());

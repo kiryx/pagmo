@@ -39,6 +39,7 @@ SET(PAGMO_LIB_SRC_LIST
 	${CMAKE_CURRENT_SOURCE_DIR}/algorithm/nspso.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/algorithm/spea2.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/algorithm/bat.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/algorithm/cuckoosearch.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/migration/base.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/migration/base_r_policy.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/migration/base_s_policy.cpp
