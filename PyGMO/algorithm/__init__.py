@@ -449,6 +449,25 @@ def _bat_ctor(
 bat._orig_init = bat.__init__
 bat.__init__ = _bat_ctor
 
+def _cuckoosearch_ctor(
+        self,
+        gen=1,
+        pa=0.25):
+    """
+    Constructs cuckoo search algorithm.
+    USAGE: algorithm.cuckoosearch(gen=1, pa=0.25)
+
+    * gen: number of generations
+    * pa: Discovery rate
+    """
+    # We set the defaults or the kwargs
+    arg_list = []
+    arg_list.append(gen)
+    arg_list.append(pa)
+    self._orig_init(*arg_list)
+
+cuckoosearch._orig_init = cuckoosearch.__init__
+cuckoosearch.__init__ = _cuckoosearch_ctor
 
 def _sga_ctor(
         self,
