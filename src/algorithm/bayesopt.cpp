@@ -70,14 +70,26 @@ void bayesopt::evolve(pagmo::population& pop) const
         pagmo_throw(value_error,
                     "The problem is not single objective and BAYESOPT is not suitable to solve it");
     }
-
+    
+    if(prob.get_c_dimension() != 0)
+    {
+        pagmo_throw(value_error,"The problem is not box constrained and Bayesopt is not suitable to solve it");
+    }
+    
     // Initialization of variables
     const auto best_idx = pop.get_best_idx();
     decision_vector x = pop.get_individual(best_idx).cur_x;
 
     bayesoptproblem_pagmo optimizer(m_params, prob);
-    boost::numeric::ublas::vector<double> bestPoint(prob.get_dimension());
+    boost::numeric::ublas::vector<double> bestPoint(prob.get_dimension()), lb(prob.get_lb().size()), ub(prob.get_ub().size());
 
+    //Copy upper bound and lower bound.
+    std::copy(prob.get_lb().begin(), prob.get_lb().end(), lb.begin());
+    std::copy(prob.get_ub().begin(), prob.get_ub().end(), ub.begin());
+        
+    //set lb and ub
+    optimizer.setBoundingBox(lb, ub);
+    
     //optimize
     optimizer.optimize(bestPoint);
 
