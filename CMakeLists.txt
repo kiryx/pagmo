@@ -65,6 +65,9 @@ OPTION(ENABLE_IPOPT "Enable support for IPOPT minimiser." OFF)
 # Build Option: WORHP optimiser.
 OPTION(ENABLE_WORHP "Enable support for WORHP minimiser." OFF)
 
+# Build Option: BAYESOPT optimiser.
+OPTION(ENABLE_BAYESOPT "Enable support for BAYESOPT optimizer." OFF)
+
 # Build Option: support for MPI clustering.
 OPTION(ENABLE_MPI "Enable support for the Message Passage Interface (MPI)." OFF)
 
@@ -375,6 +378,25 @@ IF(ENABLE_WORHP)
 	ADD_DEFINITIONS(-DPAGMO_ENABLE_WORHP)
 ENDIF(ENABLE_WORHP)
 
+# If BAYESOPT support is requested, look for the libraries.
+IF(ENABLE_BAYESOPT)
+	FIND_LIBRARY(BAYESOPT_LIBRARY NAMES bayesopt)
+	FIND_PATH(BAYESOPT_INCLUDE_DIR NAMES bayesopt.hpp)
+	IF(NOT BAYESOPT_LIBRARY)
+		MESSAGE(FATAL_ERROR "BAYESOPT support was requested, but the library could not be located. The library should be called 'libbayesopt')")
+	ENDIF(NOT BAYESOPT_LIBRARY)
+	IF(NOT ENABLE_NLOPT)
+		MESSAGE(FATAL_ERROR "BAYESOPT support was requested, but the dependency nlopt was not. Please set ENABLE_NLOPT to YES")
+	ENDIF(NOT ENABLE_NLOPT)
+	IF(NOT BAYESOPT_INCLUDE_DIR)
+		MESSAGE(FATAL_ERROR "BAYESOPT support was requested, but bayesopt.hpp not be located.")
+	ENDIF(NOT BAYESOPT_INCLUDE_DIR)
+	MESSAGE(STATUS "BAYESOPT library: ${BAYESOPT_LIBRARY}")
+	MESSAGE(STATUS "BAYESOPT include dir: ${BAYESOPT_INCLUDE_DIR}")
+	INCLUDE_DIRECTORIES("${BAYESOPT_INCLUDE_DIR}")
+	SET(MANDATORY_LIBRARIES ${MANDATORY_LIBRARIES} ${BAYESOPT_LIBRARY})
+	ADD_DEFINITIONS(-DPAGMO_ENABLE_BAYESOPT)
+ENDIF(ENABLE_BAYESOPT)
 
 # Add the directory for the PaGMO library.
 ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/src")

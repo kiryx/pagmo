@@ -105,4 +105,8 @@
 	#include "algorithm/worhp.h"
 #endif
 
+#ifdef PAGMO_ENABLE_BAYESOPT
+	#include "algorithm/bayesopt.h"
+#endif
+
 #endif

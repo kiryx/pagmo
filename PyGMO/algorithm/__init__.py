@@ -1778,3 +1778,37 @@ if "worhp" in str(_get_algorithm_list()):
         self._orig_init(*arg_list)
     worhp._orig_init = worhp.__init__
     worhp.__init__ = _worhp_ctor
+
+# BAYESOPT algorithm (only if PyGMO has been compiled with the bayesopt option
+# activated)
+if "bayesopt" in str(_get_algorithm_list()):
+    def _bayesopt_ctor(
+            self,
+            n_iterations = 190,
+            n_inner_iterations = 500,
+            n_init_samples = 10,
+            n_iter_relearn = 50,
+            init_method = 1,
+            verbose_level = 0):
+        """
+        Constructs BAYESOPT Algorithm
+        See http://rmcantin.bitbucket.org/html/usemanual.html#params for more details
+        USAGE: algorithm.bayesopt();
+        * n_iterations: Number of iterations of BayesOpt
+        * n_iter_relearn: Number of iterations between re-learning kernel parameters
+        * n_inner_iterations: (only for continuous optimization) Maximum number of iterations (per dimension)
+        * n_init_samples: Initial set of samples
+        * init_method: 1 -> Latin Hypercube Sampling (LHS), 2 -> Sobol sequences, 3 -> Uniform Sampling
+        * verbose_level: 0 -> warnings
+        """
+        # We set the defaults or the kwargs
+        arg_list = []
+        arg_list.append(n_iterations)
+        arg_list.append(n_inner_iterations)
+        arg_list.append(n_init_samples)
+        arg_list.append(n_iter_relearn)
+        arg_list.append(init_method)
+        arg_list.append(verbose_level)
+        self._orig_init(*arg_list)
+    bayesopt._orig_init = bayesopt.__init__
+    bayesopt.__init__ = _bayesopt_ctor

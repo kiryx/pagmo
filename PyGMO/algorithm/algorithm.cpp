@@ -512,6 +512,12 @@ BOOST_PYTHON_MODULE(_algorithm) {
 		.def("get_available_parameters", &algorithm::worhp::get_available_parameters);
 	#endif
 
+	// Bayesopt minimizer
+	#ifdef PAGMO_ENABLE_BAYESOPT
+	algorithm_wrapper<algorithm::bayesopt>("bayesopt", "bayesopt minimizer")
+		.def(init<optional<int, int, int, int, int, int> >());
+	#endif
+
 	// Register to_python conversion from smart pointer.
 	register_ptr_to_python<algorithm::base_ptr>();
 }

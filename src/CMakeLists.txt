@@ -236,6 +236,14 @@ IF(ENABLE_WORHP)
 	)
 ENDIF(ENABLE_WORHP)
 
+# Additional files for BAYESOPT support.
+IF(ENABLE_BAYESOPT)
+    SET(PAGMO_LIB_SRC_LIST ${PAGMO_LIB_SRC_LIST}
+        ${CMAKE_CURRENT_SOURCE_DIR}/algorithm/bayesopt.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/algorithm/bayesopt_cpp_wrapper/bayesoptproblem_pagmo.cpp
+    )
+ENDIF(ENABLE_BAYESOPT)
+
 # PaGMO MPI bits
 IF(ENABLE_MPI)
 	SET(PAGMO_LIB_SRC_LIST ${PAGMO_LIB_SRC_LIST}
