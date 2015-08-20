@@ -31,6 +31,7 @@ bayesoptproblem_pagmo::bayesoptproblem_pagmo(bopt_params param, const pagmo::pro
     m_dim(prob.get_dimension()),
     m_params(param){}
 
+
 double bayesoptproblem_pagmo::evaluateSample(const boost::numeric::ublas::vector<double> &query)
 {
     pagmo::fitness_vector f(1,0);
