@@ -227,6 +227,8 @@ class __PAGMO_VISIBLE population
 		const_iterator begin() const;
 		const_iterator end() const;
 
+		void set_problem(const problem::base_ptr &p);
+
 		void reinit(const size_type &);
 		void reinit();
 		void clear();
