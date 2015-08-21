@@ -147,7 +147,6 @@ void bat::evolve(population &pop) const
 
     decision_vector minv(Dc), maxv(Dc); // Maximum and minimum velocity allowed
 
-    double vwidth;  // Temporary variable
     double new_x;   // Temporary variable
 
     population::size_type p;    // for iterating over bats

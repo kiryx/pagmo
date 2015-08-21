@@ -73,7 +73,6 @@ void cuckoosearch::evolve(population &pop) const
         prob_c_dimension = prob.get_c_dimension(), prob_f_dimension = prob.get_f_dimension();
 
     const problem::base::size_type Dc = D - prob_i_dimension;
-    const decision_vector &lb = prob.get_lb(), &ub = prob.get_ub();
     const population::size_type swarm_size = pop.size();
 
     //We perform some checks to determine wether the problem/population are suitable for Cuckoo Search
@@ -103,7 +102,6 @@ void cuckoosearch::evolve(population &pop) const
     std::vector<fitness_vector> fitness(swarm_size);    //corresponding fitness values
 
     population::size_type p;    // for iterating over cuckoosearchs
-    problem::base::size_type d; // for iterating over problem dimensions
 
     decision_vector temp_x, gbest_x;
     fitness_vector temp_fit, gbest_fit;
