@@ -1,9 +1,9 @@
 /*****************************************************************************
- *   Copyright (C) 2015 The PaGMO development team,                          *
+ *   Copyright (C) 2004-2015 The PaGMO development team,                     *
  *   Advanced Concepts Team (ACT), European Space Agency (ESA)               *
- *   http://apps.sourceforge.net/mediawiki/pagmo                             *
- *   http://apps.sourceforge.net/mediawiki/pagmo/index.php?title=Developers  *
- *   http://apps.sourceforge.net/mediawiki/pagmo/index.php?title=Credits     *
+ *                                                                           *
+ *   https://github.com/esa/pagmo                                            *
+ *                                                                           *
  *   act@esa.int                                                             *
  *                                                                           *
  *   This program is free software; you can redistribute it and/or modify    *
@@ -40,35 +40,35 @@ namespace algorithm {
 class __PAGMO_VISIBLE bayesopt : public base
 {
 public:
-    bayesopt(const int = 190, const int = 500, const int = 10, const int = 50, const int = 1, const int = 0);
-    void evolve(pagmo::population&) const;
-    pagmo::algorithm::base_ptr clone() const;
-    std::string get_name() const;
+	bayesopt(const int = 190, const int = 500, const int = 10, const int = 50, const int = 1, const int = 0);
+	void evolve(pagmo::population&) const;
+	pagmo::algorithm::base_ptr clone() const;
+	std::string get_name() const;
 
-    //parameter settings
-    //see http://rmcantin.bitbucket.org/html/usemanual.html#params
-    void set_kernel(std::string) const;
-    void set_mean(std::string) const;
-    void set_criteria(std::string) const;
-    void set_surrogate(std::string) const;
-    void set_log_file(std::string) const;
-    void set_load_file(std::string) const;
-    void set_save_file(std::string) const;
-    void set_learning(std::string) const;
-    void set_score(std::string) const;
+	//parameter settings
+	//see http://rmcantin.bitbucket.org/html/usemanual.html#params
+	void set_kernel(std::string) const;
+	void set_mean(std::string) const;
+	void set_criteria(std::string) const;
+	void set_surrogate(std::string) const;
+	void set_log_file(std::string) const;
+	void set_load_file(std::string) const;
+	void set_save_file(std::string) const;
+	void set_learning(std::string) const;
+	void set_score(std::string) const;
 
 protected:
-    std::string human_readable_extra() const;
+	std::string human_readable_extra() const;
 
 private:
-    friend class boost::serialization::access;
-    template <class Archive>
-    void serialize(Archive &ar, const unsigned int)
-    {
-        ar & boost::serialization::base_object<base>(*this);
-    }
-    // Structure containing all the BAYESOPT parameters, see BAYESOPT documentation
-    mutable bopt_params m_params;
+	friend class boost::serialization::access;
+	template <class Archive>
+	void serialize(Archive &ar, const unsigned int)
+	{
+		ar & boost::serialization::base_object<base>(*this);
+	}
+	// Structure containing all the BAYESOPT parameters, see BAYESOPT documentation
+	mutable bopt_params m_params;
 };
 
 }} // namespaces

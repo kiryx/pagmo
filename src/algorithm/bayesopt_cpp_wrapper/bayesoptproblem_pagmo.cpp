@@ -26,27 +26,27 @@
 
 
 bayesoptproblem_pagmo::bayesoptproblem_pagmo(bopt_params param, const pagmo::problem::base &prob):
-    bayesopt::ContinuousModel(prob.get_dimension(), param),
-    m_prob(prob.clone()),
-    m_dim(prob.get_dimension()),
-    m_params(param){}
+	bayesopt::ContinuousModel(prob.get_dimension(), param),
+	m_prob(prob.clone()),
+	m_dim(prob.get_dimension()),
+	m_params(param){}
 
 
 double bayesoptproblem_pagmo::evaluateSample(const boost::numeric::ublas::vector<double> &query)
 {
-    pagmo::fitness_vector f(1,0);
-    pagmo::decision_vector d(m_dim, 0);
-    std::copy(query.begin(), query.end(), d.begin());
+	pagmo::fitness_vector f(1,0);
+	pagmo::decision_vector d(m_dim, 0);
+	std::copy(query.begin(), query.end(), d.begin());
 
-    m_prob->objfun(f, d);
+	m_prob->objfun(f, d);
 
-    return f[0];
+	return f[0];
 }
 
 bool bayesoptproblem_pagmo::checkReachability(const boost::numeric::ublas::vector<double> &query)
 {
-    pagmo::decision_vector d(m_dim, 0);
-    std::copy(query.begin(), query.end(), d.begin());
+	pagmo::decision_vector d(m_dim, 0);
+	std::copy(query.begin(), query.end(), d.begin());
 
-    return m_prob->feasibility_x(d);
+	return m_prob->feasibility_x(d);
 }

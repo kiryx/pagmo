@@ -46,38 +46,38 @@ namespace pagmo { namespace algorithm {
 class __PAGMO_VISIBLE cuckoosearch: public base
 {
 public:
-    cuckoosearch(int gen=1, double pa=0.25);
-    base_ptr clone() const;
-    void evolve(population &) const;
-    std::string get_name() const;
+	cuckoosearch(int gen=1, double pa=0.25);
+	base_ptr clone() const;
+	void evolve(population &) const;
+	std::string get_name() const;
 
 protected:
-    std::string human_readable_extra() const;
+	std::string human_readable_extra() const;
 
 private:
-    friend class boost::serialization::access;
-    template <class Archive>
-    void serialize(Archive &ar, const unsigned int)
-    {
-        ar & boost::serialization::base_object<base>(*this);
-        ar & const_cast<int &>(m_gen);
-        ar & const_cast<double &>(m_pa);
-    }
+	friend class boost::serialization::access;
+	template <class Archive>
+	void serialize(Archive &ar, const unsigned int)
+	{
+		ar & boost::serialization::base_object<base>(*this);
+		ar & const_cast<int &>(m_gen);
+		ar & const_cast<double &>(m_pa);
+	}
 
-    void get_cuckoos(const problem::base &, std::vector<decision_vector>&, const std::vector<decision_vector>&,
-        const decision_vector) const;
+	void get_cuckoos(const problem::base &, std::vector<decision_vector>&, const std::vector<decision_vector>&,
+		const decision_vector) const;
 
-    void empty_nests(const problem::base &, std::vector<decision_vector> &, const std::vector<decision_vector> &) const;
+	void empty_nests(const problem::base &, std::vector<decision_vector> &, const std::vector<decision_vector> &) const;
 
-    void get_best_nest(const problem::base &, fitness_vector &, decision_vector &, std::vector<decision_vector> &,
-        const std::vector<decision_vector> &, std::vector<fitness_vector> &) const;
+	void get_best_nest(const problem::base &, fitness_vector &, decision_vector &, std::vector<decision_vector> &,
+		const std::vector<decision_vector> &, std::vector<fitness_vector> &) const;
 
-    void applysimplebounds(const problem::base &, decision_vector &) const;
+	void applysimplebounds(const problem::base &, decision_vector &) const;
 
-    // Number of generations
-    const int m_gen;
-    // Discovery rate of alien eggs/solutions
-    const double m_pa;
+	// Number of generations
+	const int m_gen;
+	// Discovery rate of alien eggs/solutions
+	const double m_pa;
 };
 
 }} //namespaces

@@ -61,41 +61,41 @@ namespace pagmo { namespace algorithm {
 class __PAGMO_VISIBLE bat: public base
 {
 public:
-    bat(int gen=1, double qmax=2, double qmin=0, double alpha=0.9, double gam=0.9, double loudness=0.5, double pulserate=0.5);
-    base_ptr clone() const;
-    void evolve(population &) const;
-    std::string get_name() const;
+	bat(int gen=1, double qmax=2, double qmin=0, double alpha=0.9, double gam=0.9, double loudness=0.5, double pulserate=0.5);
+	base_ptr clone() const;
+	void evolve(population &) const;
+	std::string get_name() const;
 
 protected:
-    std::string human_readable_extra() const;
+	std::string human_readable_extra() const;
 private:
-    friend class boost::serialization::access;
-    template <class Archive>
-    void serialize(Archive &ar, const unsigned int)
-    {
-        ar & boost::serialization::base_object<base>(*this);
-        ar & const_cast<int &>(m_gen);
-        ar & const_cast<double &>(m_alpha);
-        ar & const_cast<double &>(m_gamma);
-        ar & const_cast<double &>(m_qmax);
-        ar & const_cast<double &>(m_qmin);
-        ar & const_cast<double &>(m_loudness);
-        ar & const_cast<double &>(m_pulserate);
-    }
-    // Number of generations
-    const int m_gen;
-    // Maximum frequency
-    const double m_qmax;
-    // Minimum frequency
-    const double m_qmin;
-    // initial pulserate
-    const double m_pulserate;
-    // initial loudness
-    const double m_loudness;
-    // rate of decrease in loadness
-    const double m_alpha;
-    // rate of increase in pulserate
-    const double m_gamma;
+	friend class boost::serialization::access;
+	template <class Archive>
+	void serialize(Archive &ar, const unsigned int)
+	{
+		ar & boost::serialization::base_object<base>(*this);
+		ar & const_cast<int &>(m_gen);
+		ar & const_cast<double &>(m_alpha);
+		ar & const_cast<double &>(m_gamma);
+		ar & const_cast<double &>(m_qmax);
+		ar & const_cast<double &>(m_qmin);
+		ar & const_cast<double &>(m_loudness);
+		ar & const_cast<double &>(m_pulserate);
+	}
+	// Number of generations
+	const int m_gen;
+	// Maximum frequency
+	const double m_qmax;
+	// Minimum frequency
+	const double m_qmin;
+	// initial pulserate
+	const double m_pulserate;
+	// initial loudness
+	const double m_loudness;
+	// rate of decrease in loadness
+	const double m_alpha;
+	// rate of increase in pulserate
+	const double m_gamma;
 };
 
 }} //namespaces
