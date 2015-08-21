@@ -96,6 +96,7 @@ void bayesopt::evolve(pagmo::population& pop) const
     std::copy(bestPoint.begin(), bestPoint.end(), x.begin());
 
     pop.set_x(best_idx, x);
+    pop.set_problem(optimizer.m_prob->clone());
 }
 
 void bayesopt::set_kernel(std::string name) const
