@@ -30,6 +30,14 @@ namespace pagmo { namespace algorithm {
 /// Constructor
  /**
  * Constructs a BAYESOPT algorithm
+ * @see http://rmcantin.bitbucket.org/html/usemanual.html#basicparams for more.
+ * @param[in] n_iterations Number of iterations of BayesOpt. Each iteration corresponds with a target function evaluation.
+ * @param[in] n_inner_iterations Maximum number of iterations (per dimension) to optimize the acquisition function (criteria).
+ * @param[in] n_init_samples Initial set of samples. Each sample requires a target function evaluation.
+ * @param[in] n_iter_relearn Number of iterations between re-learning kernel parameters. That is, kernel learning ocur 1 out of n_iter_relearn iterations.
+ * @param[in] init_method (for continuous optimization only) There are different strategies available for the initial design: 1 -> Latin Hypercube Sampling (LHS),
+ * 2 -> Sobol sequences, 3 -> Uniform Sampling.
+ * @param[in] verbose_level verbose level 1 -> info -> stdout for more levels see bayesopt documentation.
  */
 bayesopt::bayesopt(const int n_iterations, const int n_inner_iterations, const int n_init_samples, 
     const int n_iter_relearn, const int init_method, const int verbose_level)
@@ -99,46 +107,88 @@ void bayesopt::evolve(pagmo::population& pop) const
     pop.set_problem(optimizer.m_prob->clone());
 }
 
+/**
+ * Set kernel to be used
+ * @see http://rmcantin.bitbucket.org/html/bopttheory.html#kermod for options
+ * @param[in] name Name of the kernel function. Could be a combination of functions.
+ */
 void bayesopt::set_kernel(std::string name) const
 {
     strcpy(m_params.kernel.name, name.c_str());
 }
 
+/**
+ * Set the mean function (or trend) of the surrogate model.
+ * @see http://rmcantin.bitbucket.org/html/bopttheory.html#parmod for options
+ * @param[in] name Name of mean function
+ */
 void bayesopt::set_mean(std::string name) const
 {
     strcpy(m_params.mean.name, name.c_str());
 }
 
+/**
+ * Set the sample selection criterion
+ * @see http://rmcantin.bitbucket.org/html/bopttheory.html#critmod for options
+ * @param[in] name Name of the sample selection criterion or a combination of them.
+ */
 void bayesopt::set_criteria(std::string name) const
 {
     strcpy(m_params.crit_name, name.c_str());
 }
 
+/**
+ * Set the hierarchical surrogate function
+ * @see http://rmcantin.bitbucket.org/html/bopttheory.html#surrmod for options
+ * @param[in] name Name of the hierarchical surrogate function
+ */
 void bayesopt::set_surrogate(std::string name) const
 {
     strcpy(m_params.surr_name, name.c_str());
 }
 
+/**
+ * Set the name of the log file to be used.
+ * @param[in] name Name of the log file.
+ */
 void bayesopt::set_log_file(std::string name) const
 {
     strcpy(m_params.log_filename, name.c_str());
 }
 
+/**
+ * Load log file
+ * @param[in] name Name of the log file.
+ */
 void bayesopt::set_load_file(std::string name) const
 {
     strcpy(m_params.load_filename, name.c_str());
 }
 
+/**
+ * Save log file
+ * @param[in] name Name of the log file.
+ */
 void bayesopt::set_save_file(std::string name) const
 {
     strcpy(m_params.save_filename, name.c_str());
 }
 
+/**
+ * Set the learning method for learning the kernel parameters
+ * @see http://rmcantin.bitbucket.org/html/bopttheory.html#learnmod for more
+ * @param[in] name Name of the method
+ */
 void bayesopt::set_learning(std::string name) const
 {
     m_params.l_type = str2learn(name.c_str());
 }
 
+/**
+ * Set the score function
+ * @see http://rmcantin.bitbucket.org/html/bopttheory.html#learnmod for more
+ * @param[in] name of the score function.
+ */
 void bayesopt::set_score(std::string name) const
 {
     m_params.sc_type = str2score(name.c_str());

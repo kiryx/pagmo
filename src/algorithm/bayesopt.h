@@ -36,6 +36,15 @@ namespace pagmo {
 class population;
 
 namespace algorithm {
+/// Bayesian Optimization
+/**
+* BayesOpt is an efficient implementation of the Bayesian optimization methodology for nonlinear-optimization, experimental design, 
+* stochastic bandits and hyperparameter tunning. In the literature it is also called Sequential Kriging Optimization (SKO), 
+* Sequential Model-Based Optimization (SMBO) or Efficient Global Optimization (EGO).
+* @see http://rmcantin.bitbucket.org/html/index.html for detailed documentation
+*
+* @author Sunil K. Mahendrakar (sunil.mahendrakar19@gmail.com)
+*/
 
 class __PAGMO_VISIBLE bayesopt : public base
 {
