@@ -33,19 +33,19 @@
 
 class bayesoptproblem_pagmo : public bayesopt::ContinuousModel
 {
-    public:
-        bayesoptproblem_pagmo(bopt_params, const pagmo::problem::base &);
-        double evaluateSample(const boost::numeric::ublas::vector<double> &);
-        bool checkReachability(const boost::numeric::ublas::vector<double> &);
-        const pagmo::problem::base_ptr m_prob;
+	public:
+		bayesoptproblem_pagmo(bopt_params, const pagmo::problem::base &);
+		double evaluateSample(const boost::numeric::ublas::vector<double> &);
+		bool checkReachability(const boost::numeric::ublas::vector<double> &);
+		const pagmo::problem::base_ptr m_prob;
 
 
-    private:
-        //problem
-        //dimensions
-        pagmo::decision_vector::size_type m_dim;
-        // Structure containing all the BAYESOPT parameters, see BAYESOPT documentation
-        bopt_params m_params;
+	private:
+		//problem
+		//dimensions
+		pagmo::decision_vector::size_type m_dim;
+		// Structure containing all the BAYESOPT parameters, see BAYESOPT documentation
+		bopt_params m_params;
 };
 
 #endif // BAYESOPTPROBLEM_PAGMO_H

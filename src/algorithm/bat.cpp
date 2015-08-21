@@ -48,38 +48,38 @@ namespace pagmo { namespace algorithm {
  * @param[in] pulserate initial pulse rate of all bats.
  */
 bat::bat(int gen, double qmax, double qmin, double alpha, double gam, double loudness, double pulserate):base(),
-        m_gen(gen), m_qmax(qmax), m_qmin(qmin), m_pulserate(pulserate),
-        m_loudness(loudness), m_alpha(alpha), m_gamma(gam)
+		m_gen(gen), m_qmax(qmax), m_qmin(qmin), m_pulserate(pulserate),
+		m_loudness(loudness), m_alpha(alpha), m_gamma(gam)
 {
-    if (gen < 0)
-        pagmo_throw(value_error,"number of generations must be nonnegative");
+	if (gen < 0)
+		pagmo_throw(value_error,"number of generations must be nonnegative");
 
-    if(pulserate < 0 || pulserate > 1)
-        pagmo_throw(value_error,"pulse rate must be in [0, 1]");
+	if(pulserate < 0 || pulserate > 1)
+		pagmo_throw(value_error,"pulse rate must be in [0, 1]");
 
-    if(loudness <= 0)
-        pagmo_throw(value_error,"initial loudness must be greater than 0");
+	if(loudness <= 0)
+		pagmo_throw(value_error,"initial loudness must be greater than 0");
 
-    if(qmin < 0)
-        pagmo_throw(value_error,"minimum frequency must be nonnegative");
+	if(qmin < 0)
+		pagmo_throw(value_error,"minimum frequency must be nonnegative");
 
-    if(qmax < 0)
-        pagmo_throw(value_error,"minimum frequency must be nonnegative");
+	if(qmax < 0)
+		pagmo_throw(value_error,"minimum frequency must be nonnegative");
 
-    if(qmin > qmax)
-        pagmo_throw(value_error,"maximum frequency must be greater than minimum frequency");
+	if(qmin > qmax)
+		pagmo_throw(value_error,"maximum frequency must be greater than minimum frequency");
 
-    if(alpha <= 0 || alpha > 1)
-        pagmo_throw(value_error,"alpha must be in (0, 1]");
+	if(alpha <= 0 || alpha > 1)
+		pagmo_throw(value_error,"alpha must be in (0, 1]");
 
-    if(gam <= 0)
-        pagmo_throw(value_error,"gamma must be greater than 0");
+	if(gam <= 0)
+		pagmo_throw(value_error,"gamma must be greater than 0");
 }
 
 /// Clone method.
 base_ptr bat::clone() const
 {
-    return base_ptr(new bat(*this));
+	return base_ptr(new bat(*this));
 }
 
 
@@ -91,184 +91,184 @@ base_ptr bat::clone() const
  */
 void bat::evolve(population &pop) const
 {
-    rng_uint32 rng = rng_generator::get<rng_uint32>();
+	rng_uint32 rng = rng_generator::get<rng_uint32>();
 
-    boost::normal_distribution<> nd(0.0, 1.0);
+	boost::normal_distribution<> nd(0.0, 1.0);
 
-    boost::variate_generator<rng_uint32&, boost::normal_distribution<> > ndrng(rng, nd);
+	boost::variate_generator<rng_uint32&, boost::normal_distribution<> > ndrng(rng, nd);
 
-    // Let's store some useful variables.
-    const problem::base &prob = pop.problem();
-    const problem::base::size_type D = prob.get_dimension(), prob_i_dimension = prob.get_i_dimension(),
-        prob_c_dimension = prob.get_c_dimension(), prob_f_dimension = prob.get_f_dimension();
+	// Let's store some useful variables.
+	const problem::base &prob = pop.problem();
+	const problem::base::size_type D = prob.get_dimension(), prob_i_dimension = prob.get_i_dimension(),
+		prob_c_dimension = prob.get_c_dimension(), prob_f_dimension = prob.get_f_dimension();
 
-    const problem::base::size_type Dc = D - prob_i_dimension;
-    const decision_vector &lb = prob.get_lb(), &ub = prob.get_ub();
-    const population::size_type swarm_size = pop.size();
+	const problem::base::size_type Dc = D - prob_i_dimension;
+	const decision_vector &lb = prob.get_lb(), &ub = prob.get_ub();
+	const population::size_type swarm_size = pop.size();
 
-    //We perform some checks to determine wether the problem/population are suitable for BA
-    if(Dc == 0)
-    {
-        pagmo_throw(value_error,"There is no continuous part in the problem decision vector for BA to optimise");
-    }
+	//We perform some checks to determine wether the problem/population are suitable for BA
+	if(Dc == 0)
+	{
+		pagmo_throw(value_error,"There is no continuous part in the problem decision vector for BA to optimise");
+	}
 
-    if(prob_c_dimension != 0)
-    {
-        pagmo_throw(value_error,"The problem is not box constrained and BA is not suitable to solve it");
-    }
+	if(prob_c_dimension != 0)
+	{
+		pagmo_throw(value_error,"The problem is not box constrained and BA is not suitable to solve it");
+	}
 
-    if(prob_f_dimension != 1)
-    {
-        pagmo_throw(value_error,"The problem is not single objective and BA is not suitable to solve it");
-    }
+	if(prob_f_dimension != 1)
+	{
+		pagmo_throw(value_error,"The problem is not single objective and BA is not suitable to solve it");
+	}
 
-    // Get out if there is nothing to do.
-    if (swarm_size == 0 || m_gen == 0)
-        return;
+	// Get out if there is nothing to do.
+	if (swarm_size == 0 || m_gen == 0)
+		return;
 
-    // Some vectors used during evolution are allocated here.
-    std::vector<double> dummy(Dc, 0);    // used for initialisation purposes
-    std::vector<double> freq(swarm_size, 0);   // bats' frequencies
-    std::vector<double> pulserate(swarm_size, m_pulserate);   // bats' frequencies
-    std::vector<double> loudness(swarm_size, m_loudness);   // bats' loudness
+	// Some vectors used during evolution are allocated here.
+	std::vector<double> dummy(Dc, 0);	// used for initialisation purposes
+	std::vector<double> freq(swarm_size, 0);   // bats' frequencies
+	std::vector<double> pulserate(swarm_size, m_pulserate);   // bats' frequencies
+	std::vector<double> loudness(swarm_size, m_loudness);   // bats' loudness
 
-    std::vector<decision_vector> X(swarm_size, dummy);  // bats' current positions
+	std::vector<decision_vector> X(swarm_size, dummy);  // bats' current positions
 
-    decision_vector Sol;  // Temporary position
-    fitness_vector Fnew;    // Temporary fitness
+	decision_vector Sol;  // Temporary position
+	fitness_vector Fnew;	// Temporary fitness
 
-    std::vector<fitness_vector> lbfit(swarm_size);    // bats' current fitness values
+	std::vector<fitness_vector> lbfit(swarm_size);	// bats' current fitness values
 
-    std::vector<decision_vector> V(swarm_size, dummy);   // bats' velocities
+	std::vector<decision_vector> V(swarm_size, dummy);   // bats' velocities
 
-    decision_vector gbest_x;   // bats' previous best position among all bats
+	decision_vector gbest_x;   // bats' previous best position among all bats
 
-    fitness_vector gbest_fit;    // fitness at the best found search space position
+	fitness_vector gbest_fit;	// fitness at the best found search space position
 
-    decision_vector minv(Dc), maxv(Dc); // Maximum and minimum velocity allowed
+	decision_vector minv(Dc), maxv(Dc); // Maximum and minimum velocity allowed
 
-    double new_x;   // Temporary variable
+	double new_x;   // Temporary variable
 
-    population::size_type p;    // for iterating over bats
-    problem::base::size_type d; // for iterating over problem dimensions
+	population::size_type p;	// for iterating over bats
+	problem::base::size_type d; // for iterating over problem dimensions
 
-    // Copy the bat positions, their velocities and their fitness
-    for(p = 0; p < swarm_size; p++)
-    {
-        X[p] = pop.get_individual(p).cur_x;
-        V[p] = pop.get_individual(p).cur_v;
-        lbfit[p] = pop.get_individual(p).cur_f;
-    }
+	// Copy the bat positions, their velocities and their fitness
+	for(p = 0; p < swarm_size; p++)
+	{
+		X[p] = pop.get_individual(p).cur_x;
+		V[p] = pop.get_individual(p).cur_v;
+		lbfit[p] = pop.get_individual(p).cur_f;
+	}
 
-    //initialize temporary variables
-    Fnew = lbfit[0];
-    Sol = X[0];
+	//initialize temporary variables
+	Fnew = lbfit[0];
+	Sol = X[0];
 
-    gbest_fit = pop.champion().f;
-    gbest_x = pop.champion().x;
+	gbest_fit = pop.champion().f;
+	gbest_x = pop.champion().x;
 
-    /* --- Main BA loop ---*/
-    // For each generation
-    for(int g = 0; g < m_gen; ++g)
-    {
-        // For each bat in the swarm
-        for(p = 0; p < swarm_size; p++)
-        {
-            /*-------Bat Algorithm---------------------------------------------*/
-            freq[p] = m_qmin + ((m_qmin - m_qmax) * m_drng());
+	/* --- Main BA loop ---*/
+	// For each generation
+	for(int g = 0; g < m_gen; ++g)
+	{
+		// For each bat in the swarm
+		for(p = 0; p < swarm_size; p++)
+		{
+			/*-------Bat Algorithm---------------------------------------------*/
+			freq[p] = m_qmin + ((m_qmin - m_qmax) * m_drng());
 
-            //Calculate velocity
-            for(d = 0; d < Dc; d++)
-            {
-                V[p][d] = V[p][d] + ((X[p][d] - gbest_x[d]) * freq[p]);
-            }
+			//Calculate velocity
+			for(d = 0; d < Dc; d++)
+			{
+				V[p][d] = V[p][d] + ((X[p][d] - gbest_x[d]) * freq[p]);
+			}
 
-            // and we perform the position update and the feasibility correction
-            for(d = 0; d < Dc; d++)
-            {
+			// and we perform the position update and the feasibility correction
+			for(d = 0; d < Dc; d++)
+			{
 
-                // update position
-                new_x = X[p][d] + V[p][d];
+				// update position
+				new_x = X[p][d] + V[p][d];
 
-                // feasibility correction
-                // (velocity updated to that which would have taken the previous position
-                // to the newly corrected feasible position)
-                if(new_x < lb[d])
-                {
-                    new_x = lb[d];
-                }
-                else if(new_x > ub[d])
-                {
-                    new_x = ub[d];
-                }
+				// feasibility correction
+				// (velocity updated to that which would have taken the previous position
+				// to the newly corrected feasible position)
+				if(new_x < lb[d])
+				{
+					new_x = lb[d];
+				}
+				else if(new_x > ub[d])
+				{
+					new_x = ub[d];
+				}
 
-                Sol[d] = new_x;
-            }
+				Sol[d] = new_x;
+			}
 
-            // pulse rate
-            if(m_drng() > pulserate[p])
-            {
-                //Random walk, the factor 0.001 limits the step sizes of random walks
-                for(d = 0; d < Dc; d++)
-                {
-                    double r = ndrng();
-                    Sol[d] = gbest_x[d] + (0.001 * r);
-                }
-            }
+			// pulse rate
+			if(m_drng() > pulserate[p])
+			{
+				//Random walk, the factor 0.001 limits the step sizes of random walks
+				for(d = 0; d < Dc; d++)
+				{
+					double r = ndrng();
+					Sol[d] = gbest_x[d] + (0.001 * r);
+				}
+			}
 
-            //feasibility correction
-            for(d = 0; d < Dc; d++)
-            {
-                if(Sol[d] < lb[d])
-                {
-                    Sol[d] = lb[d];
-                }
-                else if(Sol[d] > ub[d])
-                {
-                    Sol[d] = ub[d];
-                }
-            }
+			//feasibility correction
+			for(d = 0; d < Dc; d++)
+			{
+				if(Sol[d] < lb[d])
+				{
+					Sol[d] = lb[d];
+				}
+				else if(Sol[d] > ub[d])
+				{
+					Sol[d] = ub[d];
+				}
+			}
 
-            // We evaluate here the new individual fitness as to be able to update the global best in real time
-            prob.objfun(Fnew, Sol);
-            m_fevals++;
+			// We evaluate here the new individual fitness as to be able to update the global best in real time
+			prob.objfun(Fnew, Sol);
+			m_fevals++;
 
-            // update if solution is improved, and not too loud
-            if(prob.compare_fitness(Fnew, lbfit[p]) && m_drng() < loudness[p])
-            {
-                // update the bat's previous best position and fitness
-                X[p] = Sol;
-                lbfit[p] = Fnew;
+			// update if solution is improved, and not too loud
+			if(prob.compare_fitness(Fnew, lbfit[p]) && m_drng() < loudness[p])
+			{
+				// update the bat's previous best position and fitness
+				X[p] = Sol;
+				lbfit[p] = Fnew;
 
-                //decrease loudness
-                loudness[p] = m_alpha * loudness[p];
+				//decrease loudness
+				loudness[p] = m_alpha * loudness[p];
 
-                //increase pulse rate
-                pulserate[p] = pulserate[p] * (1 - exp(-1 * m_gamma * g));
-            }
+				//increase pulse rate
+				pulserate[p] = pulserate[p] * (1 - exp(-1 * m_gamma * g));
+			}
 
-            // update the best position observed so far by any bat in the swarm
-            if(prob.compare_fitness(Fnew, gbest_fit))
-            {
-                gbest_x = Sol;
-                gbest_fit = Fnew;
-            }
-        } //End of loop on the population members
+			// update the best position observed so far by any bat in the swarm
+			if(prob.compare_fitness(Fnew, gbest_fit))
+			{
+				gbest_x = Sol;
+				gbest_fit = Fnew;
+			}
+		} //End of loop on the population members
 
-    } // end of main BA loop
+	} // end of main BA loop
 
-    // copy bats' positions & velocities back to the main population
-    for(p = 0; p < swarm_size; p++)
-    {
-        pop.set_x(p, X[p]); // sets: cur_x, cur_f, best_x, best_f
-        pop.set_v(p, V[p]); // sets: cur_v
-    }
+	// copy bats' positions & velocities back to the main population
+	for(p = 0; p < swarm_size; p++)
+	{
+		pop.set_x(p, X[p]); // sets: cur_x, cur_f, best_x, best_f
+		pop.set_v(p, V[p]); // sets: cur_v
+	}
 }
 
 /// Algorithm name
 std::string bat::get_name() const
 {
-    return "Bat algorithm";
+	return "Bat algorithm";
 }
 
 /// Extra human readable algorithm info.
@@ -277,16 +277,16 @@ std::string bat::get_name() const
  */
 std::string bat::human_readable_extra() const
 {
-    std::ostringstream s;
-    s << "gen:" << m_gen << ' ';
-    s << "qmax:" <<  m_qmax << ' ';
-    s << "qmin:" <<  m_qmin << ' ';
-    s << "pulserate:" <<  m_pulserate << ' ';
-    s << "loudness:" <<  m_loudness << ' ';
-    s << "alpha:" <<  m_alpha << ' ';
-    s << "gamma:" <<  m_gamma << ' ';
+	std::ostringstream s;
+	s << "gen:" << m_gen << ' ';
+	s << "qmax:" <<  m_qmax << ' ';
+	s << "qmin:" <<  m_qmin << ' ';
+	s << "pulserate:" <<  m_pulserate << ' ';
+	s << "loudness:" <<  m_loudness << ' ';
+	s << "alpha:" <<  m_alpha << ' ';
+	s << "gamma:" <<  m_gamma << ' ';
 
-    return s.str();
+	return s.str();
 }
 
 }} //namespaces
