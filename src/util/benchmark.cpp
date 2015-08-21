@@ -25,7 +25,14 @@
 #include "benchmark.h"
 
 namespace pagmo { namespace util { namespace coco {
-
+/**
+ * Constructs a meta problem(benchmark) which is used for benchmarking any pagmo::problem 
+ * @param[in] p pagmo::problem to be benchmarked
+ * @param[in] datapath Path where the output log files would be stored
+ * @param[in] algname Name of the algorithm to be used for post processing
+ * @param[in] instanceId Instance Id to be used for post processing
+ * @param[in] comments comments to be used for post processing
+ */
 benchmark::benchmark(const pagmo::problem::base & p, const std::string datapath, 
                         const std::string algname, unsigned int instanceId, std::string comments) : pagmo::problem::base_meta(p,
                                 p.get_dimension(), // Ambiguous without the cast ...
@@ -220,6 +227,7 @@ benchmark::benchmark(const benchmark &obj) : base_meta(obj),
             m_rdataFilePath(obj.m_rdataFilePath),
             m_runCounter(obj.m_runCounter) {}
 
+//Implementation of the objective function
 void benchmark::objfun_impl(fitness_vector &f, const decision_vector &x) const
 {
     unsigned int boolImprovement = 0;
@@ -449,6 +457,10 @@ void benchmark::restart(std::string restart_reason) const
   storeData(m_rdataFile, m_LastEval.num, m_LastEval.F, m_BestFEval.F, m_LastEval.x);
 }
 
+/**
+ * Finalize benchmarking (and write final data to log files)
+ * @param[in] pop pagmo::population
+ */
 void benchmark::finalize(population &pop) const
 {
     (dynamic_cast<const benchmark&>(pop.problem())).writeFinalData();
@@ -456,7 +468,7 @@ void benchmark::finalize(population &pop) const
 
 std::string benchmark::get_name() const
 {
-    std::string retval("benchmark benchmarking - ");
+    std::string retval("COCO benchmarking - ");
     retval.append(m_original_problem->get_name());
 
     return retval;
