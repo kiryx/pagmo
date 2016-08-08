@@ -55,6 +55,10 @@ problem::base_ptr &population_access::get_problem_ptr(population &pop)
 	return pop.m_prob;
 }
 
+void population::set_problem(const problem::base_ptr &p) {
+	m_prob = p;
+}
+
 /// Constructor from problem::base and number of individuals.
 /**
  * Will store a copy of the problem and will initialise the population to n randomly-generated individuals.

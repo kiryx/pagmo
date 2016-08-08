@@ -3,7 +3,9 @@ from PyGMO.util._util import *
 from PyGMO.util._analysis import *
 from PyGMO.util._tsp import read_tsplib
 
-__all__ = ['hypervolume', 'hv_algorithm', 'tsp']
+from PyGMO.util import coco
+
+__all__ = ['hypervolume', 'hv_algorithm', 'tsp', 'coco']
 
 
 hv_algorithm.__doc__ = """Module containing available algorithms for the hypervolume computation

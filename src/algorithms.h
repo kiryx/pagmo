@@ -60,6 +60,8 @@
 #include "algorithm/spea2.h"
 #include "algorithm/inverover.h"
 #include "algorithm/nn_tsp.h"
+#include "algorithm/bat.h"
+#include "algorithm/cuckoosearch.h"
 
 // Hyper-heuristics
 #include "algorithm/mbh.h"
@@ -101,6 +103,10 @@
 
 #ifdef PAGMO_ENABLE_WORHP
 	#include "algorithm/worhp.h"
+#endif
+
+#ifdef PAGMO_ENABLE_BAYESOPT
+	#include "algorithm/bayesopt.h"
 #endif
 
 #endif

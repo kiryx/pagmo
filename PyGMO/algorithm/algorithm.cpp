@@ -327,6 +327,14 @@ BOOST_PYTHON_MODULE(_algorithm) {
 	// Particle Swarm Optimization (generational with racing mechanism)
 	algorithm_wrapper<algorithm::pso_generational_racing>("pso_gen_racing", "Particle Swarm Optimization (generational with racing)")
 		.def(init<optional<int,double, double, double, double, int, int, int, unsigned int, unsigned int> >());
+
+	// Bat Algorithm
+	algorithm_wrapper<algorithm::bat>("bat", "Bat Algorithm")
+		.def(init<optional<int, double, double, double, double, double, double> >());
+	
+    // Cuckoo Search Algorithm
+	algorithm_wrapper<algorithm::cuckoosearch>("cuckoosearch", "Cuckoo Search Algorithm")
+		.def(init<optional<int, double> >());
 	
 	// Simple Genetic Algorithm.
 	algorithm_wrapper<algorithm::sga>("sga", "A simple genetic algorithm (generational)")
@@ -502,6 +510,12 @@ BOOST_PYTHON_MODULE(_algorithm) {
 		.def("set_param", &algorithm::worhp::set_param)
 		.def("get_param", &algorithm::worhp::get_param)
 		.def("get_available_parameters", &algorithm::worhp::get_available_parameters);
+	#endif
+
+	// Bayesopt minimizer
+	#ifdef PAGMO_ENABLE_BAYESOPT
+	algorithm_wrapper<algorithm::bayesopt>("bayesopt", "bayesopt minimizer")
+		.def(init<optional<int, int, int, int, int, int> >());
 	#endif
 
 	// Register to_python conversion from smart pointer.

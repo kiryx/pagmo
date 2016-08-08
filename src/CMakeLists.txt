@@ -38,6 +38,8 @@ SET(PAGMO_LIB_SRC_LIST
 	${CMAKE_CURRENT_SOURCE_DIR}/algorithm/cstrs_core.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/algorithm/nspso.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/algorithm/spea2.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/algorithm/bat.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/algorithm/cuckoosearch.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/migration/base.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/migration/base_r_policy.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/migration/base_s_policy.cpp
@@ -105,6 +107,7 @@ SET(PAGMO_LIB_SRC_LIST
 	${CMAKE_CURRENT_SOURCE_DIR}/problem/noisy.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/problem/robust.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/problem/con2uncon.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/problem/bbob2015.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/topology/barabasi_albert.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/topology/clustered_ba.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/topology/ageing_clustered_ba.cpp
@@ -137,6 +140,7 @@ SET(PAGMO_LIB_SRC_LIST
 	${CMAKE_CURRENT_SOURCE_DIR}/util/neighbourhood.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/util/race_pop.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/util/race_algo.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/util/benchmark.cpp
 )
 
 # Additional files for the GTOP problems and keplerian toolbox.
@@ -234,6 +238,14 @@ IF(ENABLE_WORHP)
 		${CMAKE_CURRENT_SOURCE_DIR}/algorithm/worhp_cpp_wrapper/set_get_params.cpp
 	)
 ENDIF(ENABLE_WORHP)
+
+# Additional files for BAYESOPT support.
+IF(ENABLE_BAYESOPT)
+    SET(PAGMO_LIB_SRC_LIST ${PAGMO_LIB_SRC_LIST}
+        ${CMAKE_CURRENT_SOURCE_DIR}/algorithm/bayesopt.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/algorithm/bayesopt_cpp_wrapper/bayesoptproblem_pagmo.cpp
+    )
+ENDIF(ENABLE_BAYESOPT)
 
 # PaGMO MPI bits
 IF(ENABLE_MPI)
